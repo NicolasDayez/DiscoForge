@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DiscoForge — Google Discover Analyzer</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0b;
+    --surface: #111113;
+    --surface2: #18181c;
+    --border: #2a2a32;
+    --accent: #e8ff47;
+    --accent2: #ff6b35;
+    --accent3: #7eb8ff;
+    --text: #f0efe8;
+    --text-muted: #6b6b7a;
+    --text-dim: #3d3d48;
+    --red: #ff4d6d;
+    --green: #4ade80;
+    --purple: #c084fc;
+    --mono: 'DM Mono', monospace;
+    --serif: 'DM Serif Display', serif;
+    --sans: 'DM Sans', sans-serif;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-weight: 300;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 999;
+    opacity: 0.4;
+  }
+
+  /* ── Header ── */
+  header {
+    padding: 1.4rem 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: rgba(10,10,11,0.93);
+    backdrop-filter: blur(14px);
+    z-index: 100;
+  }
+  .logo { display: flex; align-items: baseline; gap: 0.1em; }
+  .logo-title { font-family: var(--serif); font-size: 1.55rem; letter-spacing: -0.02em; }
+  .logo-dot {
+    width: 7px; height: 7px;
+    background: var(--accent); border-radius: 50%;
+    display: inline-block; margin-left: 3px;
+    animation: pdot 2s ease-in-out infinite;
+    vertical-align: middle;
+  }
+  @keyframes pdot { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.5);opacity:.6} }
+  .header-badge {
+    font-family: var(--mono); font-size: 0.63rem;
+    color: var(--text-muted); letter-spacing: 0.12em; text-transform: uppercase;
+    border: 1px solid var(--border); padding: 0.28rem 0.65rem; border-radius: 2rem;
+  }
+
+  /* ── Hero ── */
+  .hero { padding: 4.5rem 3rem 2.5rem; max-width: 900px; margin: 0 auto; }
+  .eyebrow {
+    font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 1.2rem; display: flex; align-items: center; gap: 0.8rem;
+  }
+  .eyebrow::before { content:''; width:2rem; height:1px; background:var(--accent); }
+  .hero h1 {
+    font-family: var(--serif); font-size: clamp(2.6rem,6vw,4.8rem);
+    line-height: 1.05; letter-spacing: -0.03em; margin-bottom: 1.2rem;
+  }
+  .hero h1 em { font-style: italic; color: var(--accent); }
+  .hero-sub { font-size: .95rem; color: var(--text-muted); line-height: 1.75; max-width: 520px; font-weight: 300; }
+
+  /* ── Formula strip ── */
+  .formula-strip {
+    max-width: 900px; margin: 2.5rem auto; padding: 0 3rem;
+  }
+  .formula-inner {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 4px;
+    padding: 1.2rem 1.8rem;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: .8rem 2rem;
+  }
+  .formula-item { font-family: var(--mono); font-size: .7rem; color: var(--text-muted); line-height: 1.6; }
+  .formula-item span { display:block; color: var(--accent3); margin-bottom:.15rem; font-size:.62rem; letter-spacing:.1em; text-transform:uppercase; }
+
+  /* ── Tabs ── */
+  .tabs-wrap { max-width: 900px; margin: 0 auto; padding: 0 3rem; }
+  .tabs {
+    display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 2rem;
+  }
+  .tab-btn {
+    background: none; border: none; cursor: pointer;
+    font-family: var(--mono); font-size: .72rem; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--text-dim); padding: .85rem 1.6rem; position: relative; transition: color .18s;
+    border-bottom: 2px solid transparent; margin-bottom: -1px;
+  }
+  .tab-btn:hover { color: var(--text-muted); }
+  .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab-icon { margin-right: .45rem; }
+
+  /* ── Panels ── */
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* ── Input section ── */
+  .input-section { max-width: 900px; margin: 0 auto; padding: 0 3rem 4rem; }
+  .input-label {
+    font-family: var(--mono); font-size: .67rem; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--text-muted); margin-bottom: .7rem;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .input-label span { color: var(--text-dim); }
+  textarea {
+    width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 4px;
+    color: var(--text); font-family: var(--mono); font-size: .84rem; line-height: 1.9;
+    padding: 1.3rem 1.5rem; resize: vertical; min-height: 150px;
+    outline: none; transition: border-color .2s; caret-color: var(--accent);
+  }
+  textarea:focus { border-color: var(--accent); }
+  textarea::placeholder { color: var(--text-dim); font-style: italic; }
+  .input-footer { display:flex; align-items:center; justify-content:space-between; margin-top: .9rem; }
+  .count-badge { font-family:var(--mono); font-size:.68rem; color:var(--text-dim); }
+  .count-badge b { color:var(--text-muted); font-weight:500; }
+
+  /* ── Image drop zone ── */
+  .image-zone {
+    width: 100%;
+    background: var(--surface);
+    border: 1px dashed var(--border);
+    border-radius: 4px;
+    padding: 2.5rem 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color .2s, background .2s;
+    position: relative;
+  }
+  .image-zone:hover, .image-zone.drag-over {
+    border-color: var(--accent);
+    background: rgba(232,255,71,0.03);
+  }
+  .image-zone input[type=file] {
+    position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+  }
+  .drop-icon { font-size: 2rem; margin-bottom: .8rem; opacity: .5; }
+  .drop-label {
+    font-family: var(--mono); font-size: .72rem; color: var(--text-muted);
+    letter-spacing: .1em; text-transform: uppercase; margin-bottom: .3rem;
+  }
+  .drop-sub { font-size: .78rem; color: var(--text-dim); }
+  .image-preview-wrap {
+    display: none; position: relative; margin-top: 1.2rem;
+  }
+  .image-preview-wrap.has-image { display: block; }
+  .image-preview {
+    max-height: 260px; border-radius: 4px; border: 1px solid var(--border);
+    object-fit: contain; display: block; margin: 0 auto;
+  }
+  .img-clear-btn {
+    position: absolute; top: .5rem; right: .5rem;
+    background: rgba(10,10,11,.85); border: 1px solid var(--border);
+    color: var(--text-muted); font-size: .72rem; font-family: var(--mono);
+    padding: .25rem .6rem; border-radius: 3px; cursor: pointer; transition: color .15s;
+  }
+  .img-clear-btn:hover { color: var(--red); }
+
+  /* Image score dimensions */
+  .img-dimensions-note {
+    background: var(--surface2); border: 1px solid var(--border); border-radius: 4px;
+    padding: 1rem 1.5rem; margin-top: 1.5rem;
+    font-family: var(--mono); font-size: .67rem; color: var(--text-muted); line-height: 1.8;
+  }
+  .img-dimensions-note strong { color: var(--accent3); font-weight: 500; }
+
+  /* ── Buttons ── */
+  .analyze-btn {
+    background: var(--accent); color: #0a0a0b;
+    border: none; padding: .85rem 2.2rem;
+    font-family: var(--mono); font-size: .78rem; font-weight: 500;
+    letter-spacing: .1em; text-transform: uppercase;
+    cursor: pointer; border-radius: 3px; transition: all .18s;
+  }
+  .analyze-btn:hover { background: #f5ff7a; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(232,255,71,.22); }
+  .analyze-btn:active { transform: translateY(0); }
+  .analyze-btn:disabled { opacity: .38; cursor: not-allowed; transform: none; box-shadow: none; }
+  .btn-inner { display:flex; align-items:center; gap:.55rem; }
+
+  .analyze-btn.img-btn { background: var(--purple); color: #0a0a0b; }
+  .analyze-btn.img-btn:hover { background: #d8b4fe; box-shadow: 0 8px 24px rgba(192,132,252,.22); }
+
+  /* ── Loading ── */
+  .loading-state { display:none; max-width:900px; margin: 0 auto 2.5rem; padding: 0 3rem; }
+  .loading-state.active { display:block; }
+  .loading-bar-wrap { height:2px; background:var(--border); border-radius:1px; overflow:hidden; margin-bottom:.8rem; }
+  .loading-bar {
+    height:100%;
+    background: linear-gradient(90deg, var(--accent) 0%, var(--accent2) 50%, var(--accent) 100%);
+    background-size: 200% 100%;
+    animation: sbar 1.2s linear infinite; width:60%;
+  }
+  .loading-bar.img-bar { background: linear-gradient(90deg, var(--purple) 0%, var(--accent3) 50%, var(--purple) 100%); background-size: 200% 100%; }
+  @keyframes sbar { 0%{background-position:200% 0;transform:translateX(-100%)} 100%{background-position:-200% 0;transform:translateX(200%)} }
+  .loading-text { font-family:var(--mono); font-size:.7rem; color:var(--text-muted); letter-spacing:.08em; animation: blink 1.4s ease-in-out infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.35} }
+
+  /* ── Results ── */
+  .results-section { max-width:900px; margin:0 auto; padding: 0 3rem 6rem; }
+  .results-header {
+    font-family:var(--mono); font-size:.67rem; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--text-muted); margin-bottom:1.8rem; padding-bottom:.9rem; border-bottom:1px solid var(--border);
+    display:flex; align-items:center; gap:.8rem;
+  }
+  .results-header::after { content:attr(data-count); background:var(--surface2); color:var(--text-muted); padding:.14rem .5rem; border-radius:2rem; font-size:.62rem; }
+
+  /* ── Title result card ── */
+  .result-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 4px;
+    margin-bottom: 1.4rem; overflow: hidden; animation: card-in .38s ease both;
+  }
+  @keyframes card-in { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+  .card-top {
+    padding: 1.5rem 1.8rem; border-bottom: 1px solid var(--border);
+    display: grid; grid-template-columns: 1fr auto; gap: 1.2rem; align-items: start;
+  }
+  .card-title { font-family:var(--serif); font-size:1.2rem; line-height:1.3; letter-spacing:-.01em; }
+  .pctr-display { text-align:right; flex-shrink:0; }
+  .pctr-value { font-family:var(--serif); font-size:2.6rem; line-height:1; letter-spacing:-.04em; font-style:italic; }
+  .pctr-label { font-family:var(--mono); font-size:.58rem; letter-spacing:.16em; text-transform:uppercase; color:var(--text-muted); margin-top:.25rem; }
+  .pctr-low  { color: var(--red); }
+  .pctr-mid  { color: var(--accent2); }
+  .pctr-good { color: var(--accent); }
+  .pctr-high { color: var(--green); }
+  .card-analysis { padding:1.1rem 1.8rem; font-size:.85rem; color:var(--text-muted); line-height:1.7; border-bottom:1px solid var(--border); font-style:italic; }
+  .card-scores { padding:1.3rem 1.8rem; display:grid; grid-template-columns:1fr 1fr; gap:.45rem 2rem; border-bottom:1px solid var(--border); }
+  .score-row { display:flex; align-items:center; gap:.55rem; }
+  .score-name { font-family:var(--mono); font-size:.63rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:.07em; width:120px; flex-shrink:0; }
+  .score-bar-wrap { flex:1; height:3px; background:var(--surface2); border-radius:2px; overflow:hidden; }
+  .score-bar { height:100%; border-radius:2px; transition:width .6s ease; }
+  .score-num { font-family:var(--mono); font-size:.66rem; color:var(--text-muted); width:2.4em; text-align:right; flex-shrink:0; }
+  .clickbait-row { border-top:1px dashed var(--border); margin-top:.3rem; padding-top:.4rem; }
+  .card-improvements { padding:1.1rem 1.8rem; display:flex; flex-direction:column; gap:.45rem; }
+  .improvement-item { display:flex; align-items:baseline; gap:.7rem; font-size:.8rem; color:var(--text-muted); line-height:1.5; }
+  .improvement-item::before { content:'→'; font-family:var(--mono); color:var(--accent); flex-shrink:0; font-size:.72rem; }
+  .card-meta {
+    padding:.8rem 1.8rem; background:var(--surface2);
+    display:flex; gap:1.8rem; font-family:var(--mono); font-size:.63rem; color:var(--text-dim); flex-wrap:wrap;
+  }
+  .meta-item b { color:var(--text-muted); font-weight:500; }
+
+  /* ── Image result card ── */
+  .img-result-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 4px;
+    overflow: hidden; animation: card-in .38s ease both;
+  }
+  .img-card-header {
+    padding: 1.2rem 1.8rem; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .img-card-label {
+    font-family: var(--mono); font-size: .65rem; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--purple);
+  }
+  .img-score-big {
+    font-family: var(--serif); font-size: 2.8rem; line-height: 1;
+    letter-spacing: -.04em; font-style: italic;
+  }
+  .img-score-label { font-family:var(--mono); font-size:.58rem; letter-spacing:.16em; text-transform:uppercase; color:var(--text-muted); margin-top:.25rem; text-align:right; }
+
+  .img-card-body { display: grid; grid-template-columns: 200px 1fr; gap: 0; }
+  .img-thumb-col { padding: 1.5rem; border-right: 1px solid var(--border); display:flex; flex-direction:column; gap:1rem; }
+  .img-thumb { width:100%; border-radius:3px; object-fit:cover; max-height:140px; border:1px solid var(--border); }
+  .img-tech-specs { font-family:var(--mono); font-size:.62rem; color:var(--text-dim); line-height:1.9; }
+  .img-tech-specs b { color:var(--text-muted); font-weight:500; }
+
+  .img-scores-col { padding:1.5rem 1.8rem; }
+  .img-scores-grid { display:flex; flex-direction:column; gap:.45rem; }
+
+  .img-card-analysis {
+    padding:1rem 1.8rem; font-size:.84rem; color:var(--text-muted);
+    line-height:1.7; border-top:1px solid var(--border); font-style:italic;
+  }
+  .img-card-improvements { padding:1rem 1.8rem; display:flex; flex-direction:column; gap:.4rem; border-top:1px solid var(--border); }
+  .img-card-meta { padding:.75rem 1.8rem; background:var(--surface2); display:flex; gap:1.8rem; font-family:var(--mono); font-size:.63rem; color:var(--text-dim); flex-wrap:wrap; border-top:1px solid var(--border); }
+
+  /* ── Verdict badge ── */
+  .verdict-badge {
+    display: inline-flex; align-items: center; gap: .4rem;
+    font-family: var(--mono); font-size: .65rem; letter-spacing:.1em; text-transform:uppercase;
+    padding: .28rem .7rem; border-radius: 2rem; font-weight: 500;
+  }
+  .verdict-strong  { background:rgba(74,222,128,.1); color:var(--green); border:1px solid rgba(74,222,128,.3); }
+  .verdict-good    { background:rgba(232,255,71,.08); color:var(--accent); border:1px solid rgba(232,255,71,.25); }
+  .verdict-average { background:rgba(255,107,53,.1); color:var(--accent2); border:1px solid rgba(255,107,53,.3); }
+  .verdict-weak    { background:rgba(255,77,109,.1); color:var(--red); border:1px solid rgba(255,77,109,.3); }
+
+  .error-card {
+    background:rgba(255,77,109,.05); border:1px solid rgba(255,77,109,.2);
+    border-radius:4px; padding:1.1rem 1.5rem;
+    font-family:var(--mono); font-size:.76rem; color:var(--red); margin-bottom:1.4rem;
+  }
+
+  /* ── Footer ── */
+  footer {
+    border-top:1px solid var(--border); padding:1.3rem 3rem;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .footer-l { font-family:var(--mono); font-size:.63rem; color:var(--text-dim); letter-spacing:.08em; text-transform:uppercase; }
+  .footer-r { font-family:var(--mono); font-size:.63rem; color:var(--text-dim); display:flex; align-items:center; gap:.4rem; }
+  .footer-r::before { content:''; width:6px; height:6px; background:var(--accent); border-radius:50%; animation:pdot 2s ease-in-out infinite; }
+
+  @media (max-width:680px) {
+    header, .hero, .formula-strip, .tabs-wrap, .input-section, .results-section { padding-left:1.4rem; padding-right:1.4rem; }
+    .hero { padding-top:2.8rem; }
+    .formula-strip { padding:0 1.4rem; }
+    .card-top, .img-card-body { grid-template-columns:1fr; }
+    .pctr-display, .img-score-label { text-align:left; }
+    .card-scores { grid-template-columns:1fr; }
+    .img-thumb-col { border-right:none; border-bottom:1px solid var(--border); }
+    footer { flex-direction:column; gap:.5rem; align-items:flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <span class="logo-title">DiscoForge</span>
+    <span class="logo-dot"></span>
+  </div>
+  <div class="header-badge">Google Discover · Analyse IA</div>
+</header>
+
+<section class="hero">
+  <div class="eyebrow">Optimisation Discover</div>
+  <h1>Forge tes contenus<br>pour <em>Discover</em></h1>
+  <p class="hero-sub">Analyse tes titres <em>et</em> tes images pour Google Discover — pCTR prédit sur 8 dimensions, pénalité clickbait (β), scoring visuel Discover calibré.</p>
+</section>
+
+<div class="formula-strip">
+  <div class="formula-inner">
+    <div class="formula-item"><span>Qualité titre</span>Σ(wᵢ × fᵢ) — 8 dimensions</div>
+    <div class="formula-item"><span>Pénalité β</span>1 − 0.35 × (clickbait / 10)</div>
+    <div class="formula-item"><span>pCTR</span>0.5% + 21.5% × σ(0.65 × (raw − 5.5))</div>
+    <div class="formula-item"><span>Image Discover</span>Ratio · Qualité · Sécurité · Pertinence</div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs-wrap">
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('titles')">
+      <span class="tab-icon">✦</span>Titres pCTR
+    </button>
+    <button class="tab-btn" onclick="switchTab('image')">
+      <span class="tab-icon">◈</span>Image Discover
+    </button>
+  </div>
+</div>
+
+<!-- PANEL: TITLES -->
+<div class="panel active" id="panel-titles">
+  <section class="input-section">
+    <div class="input-label">
+      Titres à analyser
+      <span>Un titre par ligne · max 5 · 150 car.</span>
+    </div>
+    <textarea id="titlesInput" placeholder="ChatGPT-5 dévoilé : les fonctionnalités qui vont tout changer&#10;Apple rachète OpenAI pour 200 milliards de dollars&#10;Nouveau record de chaleur à Paris ce mercredi" spellcheck="false"></textarea>
+    <div class="input-footer">
+      <div class="count-badge"><b id="titleCount">0</b> titre(s)</div>
+      <button class="analyze-btn" id="analyzeBtn" onclick="runTitleAnalysis()">
+        <span class="btn-inner">
+          <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" stroke="currentColor" stroke-width="1.5"/><path d="M4 6l1.5 1.5L8 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Analyser pCTR
+        </span>
+      </button>
+    </div>
+  </section>
+</div>
+
+<!-- PANEL: IMAGE -->
+<div class="panel" id="panel-image">
+  <section class="input-section">
+    <div class="input-label">
+      Image à analyser
+      <span>JPG · PNG · WEBP · max ~4 Mo</span>
+    </div>
+    <div class="image-zone" id="imageZone">
+      <input type="file" id="imageInput" accept="image/jpeg,image/png,image/webp,image/gif" onchange="handleImageFile(this.files[0])">
+      <div class="drop-icon">◈</div>
+      <div class="drop-label">Déposer une image ici</div>
+      <div class="drop-sub">ou cliquer pour parcourir</div>
+    </div>
+    <div class="image-preview-wrap" id="previewWrap">
+      <img id="imagePreview" class="image-preview" src="" alt="Aperçu">
+      <button class="img-clear-btn" onclick="clearImage()">✕ Retirer</button>
+    </div>
+
+    <div class="img-dimensions-note">
+      <strong>Critères analysés par Claude Vision :</strong><br>
+      Ratio d'aspect · Résolution estimée · Qualité technique · Présence de texte sur l'image ·
+      Pertinence Discover · Sécurité (Safe Search) · Attrait visuel de la carte ·
+      Cohérence avec un sujet d'actualité · Recommandation og:image
+    </div>
+
+    <div class="input-footer" style="margin-top:1.5rem;">
+      <div class="count-badge" id="imgStatus">Aucune image</div>
+      <button class="analyze-btn img-btn" id="analyzeImgBtn" onclick="runImageAnalysis()" disabled>
+        <span class="btn-inner">
+          <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><rect x="1" y="1" width="10" height="10" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M1 8l3-3 2 2 2-3 3 4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Analyser l'image
+        </span>
+      </button>
+    </div>
+  </section>
+</div>
+
+<!-- LOADING -->
+<div class="loading-state" id="loadingState">
+  <div style="max-width:900px;margin:0 auto;padding:0 3rem;">
+    <div class="loading-bar-wrap"><div class="loading-bar" id="loadingBar"></div></div>
+    <div class="loading-text" id="loadingText">Analyse en cours…</div>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<section class="results-section" id="resultsSection" style="display:none;">
+  <div class="results-header" id="resultsHeader" data-count="">Résultats</div>
+  <div id="resultsContainer"></div>
+</section>
+
+<footer>
+  <div class="footer-l">DiscoForge — Google Discover Analyzer</div>
+  <div class="footer-r">Propulsé par Claude Sonnet 4</div>
+</footer>
+
+<script>
+/* ═══════════════════════════════════════
+   SHARED CONSTANTS
+═══════════════════════════════════════ */
+const QUALITY_WEIGHTS = {
+  entity_density: 0.22, topic_clarity: 0.18, informational_value: 0.16,
+  freshness_signal: 0.12, engagement_depth: 0.10, title_formatting: 0.08,
+  natural_authority: 0.08, visual_promise: 0.06,
+};
+const SCORE_LABELS = {
+  entity_density: 'Entités KG', topic_clarity: 'Clarté sujet',
+  informational_value: 'Valeur info', freshness_signal: 'Fraîcheur',
+  engagement_depth: 'Engagement', title_formatting: 'Formatage',
+  natural_authority: 'Autorité', visual_promise: 'Visuel',
+};
+const IMG_WEIGHTS = {
+  aspect_ratio: 0.20, technical_quality: 0.18, visual_appeal: 0.18,
+  discover_relevance: 0.16, text_overlay: 0.12, safe_search: 0.10, news_coherence: 0.06,
+};
+const IMG_LABELS = {
+  aspect_ratio: 'Ratio aspect', technical_quality: 'Qualité tech',
+  visual_appeal: 'Attrait visuel', discover_relevance: 'Pertinence Discover',
+  text_overlay: 'Texte sur image', safe_search: 'Sécurité', news_coherence: 'Cohérence actu',
+};
+
+const BETA_WEIGHT = 0.35, CTR_FLOOR = 0.005, CTR_CEIL = 0.22;
+const SIGMOID_ALPHA = 0.65, SIGMOID_MU = 5.5;
+
+function computePctr(scores, clickbait) {
+  let quality = 0;
+  for (const k in QUALITY_WEIGHTS) quality += QUALITY_WEIGHTS[k] * scores[k];
+  const beta = 1.0 - (BETA_WEIGHT * clickbait / 10);
+  const raw = quality * beta;
+  const z = SIGMOID_ALPHA * (raw - SIGMOID_MU);
+  const sig = 1.0 / (1.0 + Math.exp(-z));
+  const pctr = CTR_FLOOR + (CTR_CEIL - CTR_FLOOR) * sig;
+  return {
+    pctr: Math.round(pctr * 100000) / 100000,
+    pctr_pct: Math.round(pctr * 10000) / 100,
+    quality_score: Math.round(quality * 100) / 100,
+    beta_penalty: Math.round(beta * 1000) / 1000,
+    raw_score: Math.round(raw * 100) / 100,
+  };
+}
+
+function computeImgScore(scores) {
+  let total = 0;
+  for (const k in IMG_WEIGHTS) total += IMG_WEIGHTS[k] * (scores[k] || 0);
+  return Math.round(total * 100) / 100;
+}
+
+function getPctrClass(p) {
+  if (p < 4) return 'pctr-low'; if (p < 8) return 'pctr-mid';
+  if (p < 13) return 'pctr-good'; return 'pctr-high';
+}
+function getBarColor(v) {
+  if (v >= 7.5) return '#4ade80'; if (v >= 5) return '#e8ff47';
+  if (v >= 3) return '#ff6b35'; return '#ff4d6d';
+}
+function getImgScoreClass(s) {
+  if (s >= 7.5) return 'pctr-high'; if (s >= 5.5) return 'pctr-good';
+  if (s >= 3.5) return 'pctr-mid'; return 'pctr-low';
+}
+function getVerdictClass(s) {
+  if (s >= 7.5) return 'verdict-strong'; if (s >= 5.5) return 'verdict-good';
+  if (s >= 3.5) return 'verdict-average'; return 'verdict-weak';
+}
+function getVerdictLabel(s) {
+  if (s >= 7.5) return '✓ Excellente'; if (s >= 5.5) return '↑ Bonne';
+  if (s >= 3.5) return '~ Passable'; return '✗ Faible';
+}
+function escapeHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* ═══════════════════════════════════════
+   TABS
+═══════════════════════════════════════ */
+function switchTab(t) {
+  document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', (i===0&&t==='titles')||(i===1&&t==='image')));
+  document.getElementById('panel-titles').classList.toggle('active', t === 'titles');
+  document.getElementById('panel-image').classList.toggle('active', t === 'image');
+  document.getElementById('resultsSection').style.display = 'none';
+}
+
+/* ═══════════════════════════════════════
+   TITLE ANALYSIS
+═══════════════════════════════════════ */
+const textarea = document.getElementById('titlesInput');
+const countEl  = document.getElementById('titleCount');
+textarea.addEventListener('input', () => {
+  const t = textarea.value.split('\n').map(s=>s.trim()).filter(Boolean);
+  countEl.textContent = Math.min(t.length, 5);
+});
+const initT = textarea.value.split('\n').map(s=>s.trim()).filter(Boolean);
+countEl.textContent = Math.min(initT.length, 5);
+
+const TITLE_PROMPT = `Tu es un analyste pCTR pour Google Discover. Analyse le titre donné et score chaque dimension de 0.0 à 10.0.
+
+DIMENSIONS (plus c'est haut, mieux c'est) :
+1. entity_density (22%) — Entités Knowledge Graph : personnes, marques, lieux, événements
+2. topic_clarity (18%) — Clarté du sujet pour la classification Discover
+3. informational_value (16%) — Valeur informative, prédit engagement_time_msec élevé
+4. freshness_signal (12%) — Signal breaking news (bucket 1-7 jours = max)
+5. engagement_depth (10%) — Prédit vrai engagement ou bounce rapide
+6. title_formatting (8%) — Longueur optimale 60-100 chars, ponctuation naturelle
+7. natural_authority (8%) — Langage fiable, attributions, sources
+8. visual_promise (6%) — Implique un contenu visuel fort pour la carte
+
+PÉNALITÉ (plus haut = plus clickbait = pCTR réduit) :
+9. clickbait_score — rétention d'info forcée, exagération, manipulation (0=aucun, 10=extrême)
+
+Fournis : analyse courte (1-2 phrases) + 2 améliorations concrètes.
+Réponds UNIQUEMENT en JSON valide sans markdown :
+{"scores":{"entity_density":<f>,"topic_clarity":<f>,"informational_value":<f>,"freshness_signal":<f>,"engagement_depth":<f>,"title_formatting":<f>,"natural_authority":<f>,"visual_promise":<f>},"clickbait_score":<f>,"analysis":"<s>","improvements":["<s>","<s>"]}`;
+
+async function analyzeTitle(title) {
+  const r = await fetch("https://api.anthropic.com/v1/messages", {
+    method:"POST", headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({
+      model:"claude-sonnet-4-20250514", max_tokens:1000, temperature:0,
+      messages:[{role:"user", content:`${TITLE_PROMPT}\n\nTITRE: "${title}"`}]
+    })
+  });
+  if (!r.ok) throw new Error(`API ${r.status}: ${await r.text()}`);
+  const msg = await r.json();
+  let txt = msg.content[0].text.trim();
+  if (txt.startsWith('```')) txt = txt.replace(/^```(?:json)?\s*/,'').replace(/\s*```$/,'');
+  const p = JSON.parse(txt);
+  const scores = {};
+  for (const k in QUALITY_WEIGHTS) scores[k] = Math.max(0, Math.min(10, parseFloat(p.scores[k])));
+  const clickbait = Math.max(0, Math.min(10, parseFloat(p.clickbait_score)));
+  return { title, scores, clickbait_score: clickbait, analysis: p.analysis||'', improvements: p.improvements||[], ...computePctr(scores, clickbait) };
+}
+
+function renderTitleCard(result, idx) {
+  if (result.error) return `<div class="error-card" style="animation-delay:${idx*.1}s">⚠ "${escapeHtml(result.title)}" — ${escapeHtml(result.error)}</div>`;
+  const cls = getPctrClass(result.pctr_pct);
+  const rows = Object.entries(result.scores).map(([k,v])=>`
+    <div class="score-row">
+      <div class="score-name">${SCORE_LABELS[k]}</div>
+      <div class="score-bar-wrap"><div class="score-bar" style="width:${v*10}%;background:${getBarColor(v)}"></div></div>
+      <div class="score-num">${v.toFixed(1)}</div>
+    </div>`).join('');
+  const imps = result.improvements.map(s=>`<div class="improvement-item">${escapeHtml(s)}</div>`).join('');
+  return `<div class="result-card" style="animation-delay:${idx*.12}s">
+    <div class="card-top">
+      <div class="card-title">${escapeHtml(result.title)}</div>
+      <div class="pctr-display">
+        <div class="pctr-value ${cls}">${result.pctr_pct}%</div>
+        <div class="pctr-label">pCTR Discover</div>
+      </div>
+    </div>
+    <div class="card-analysis">${escapeHtml(result.analysis)}</div>
+    <div class="card-scores">${rows}
+      <div class="score-row clickbait-row" style="grid-column:1/-1">
+        <div class="score-name" style="color:${result.clickbait_score>5?'var(--red)':'var(--text-dim)'}">Clickbait β</div>
+        <div class="score-bar-wrap"><div class="score-bar" style="width:${result.clickbait_score*10}%;background:${result.clickbait_score>5?'var(--red)':'var(--text-dim)'}"></div></div>
+        <div class="score-num" style="color:${result.clickbait_score>5?'var(--red)':'inherit'}">${result.clickbait_score.toFixed(1)}</div>
+      </div>
+    </div>
+    ${imps?`<div class="card-improvements">${imps}</div>`:''}
+    <div class="card-meta">
+      <div class="meta-item">Qualité <b>${result.quality_score}</b></div>
+      <div class="meta-item">Pénalité β <b>${result.beta_penalty}</b></div>
+      <div class="meta-item">Score brut <b>${result.raw_score}</b></div>
+      <div class="meta-item">pCTR <b>${result.pctr}</b></div>
+    </div>
+  </div>`;
+}
+
+const titleLoadingMsgs = [
+  'Analyse via Claude en cours…','Scoring des entités Knowledge Graph…',
+  'Calcul de la pénalité clickbait (β)…','Application de la sigmoid pCTR…',
+];
+
+async function runTitleAnalysis() {
+  const raw = textarea.value.split('\n').map(t=>t.trim()).filter(Boolean).slice(0,5);
+  if (!raw.length) return;
+  const btn = document.getElementById('analyzeBtn');
+  startLoading(btn, titleLoadingMsgs, false);
+  const results = [];
+  for (const t of raw) {
+    try { results.push(await analyzeTitle(t)); }
+    catch(e) { results.push({title:t, error:e.message}); }
+  }
+  showResults(results.map((r,i)=>renderTitleCard(r,i)).join(''), `${results.length} résultat${results.length>1?'s':''}`);
+  stopLoading(btn);
+}
+
+/* ═══════════════════════════════════════
+   IMAGE ANALYSIS
+═══════════════════════════════════════ */
+let currentImageB64 = null;
+let currentImageType = 'image/jpeg';
+
+const imageZone = document.getElementById('imageZone');
+imageZone.addEventListener('dragover', e => { e.preventDefault(); imageZone.classList.add('drag-over'); });
+imageZone.addEventListener('dragleave', () => imageZone.classList.remove('drag-over'));
+imageZone.addEventListener('drop', e => {
+  e.preventDefault(); imageZone.classList.remove('drag-over');
+  const f = e.dataTransfer.files[0];
+  if (f) handleImageFile(f);
+});
+
+function handleImageFile(file) {
+  if (!file || !file.type.startsWith('image/')) return;
+  currentImageType = file.type;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const dataUrl = ev.target.result;
+    currentImageB64 = dataUrl.split(',')[1];
+    document.getElementById('imagePreview').src = dataUrl;
+    document.getElementById('previewWrap').classList.add('has-image');
+    document.getElementById('imgStatus').innerHTML = `<b>1</b> image chargée`;
+    document.getElementById('analyzeImgBtn').disabled = false;
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearImage() {
+  currentImageB64 = null;
+  document.getElementById('imagePreview').src = '';
+  document.getElementById('previewWrap').classList.remove('has-image');
+  document.getElementById('imgStatus').innerHTML = 'Aucune image';
+  document.getElementById('analyzeImgBtn').disabled = true;
+  document.getElementById('imageInput').value = '';
+}
+
+const IMG_PROMPT = `Tu es un expert en optimisation d'images pour Google Discover. Analyse cette image selon les critères Discover et score chaque dimension de 0.0 à 10.0.
+
+DIMENSIONS IMAGE DISCOVER :
+1. aspect_ratio (20%) — Le ratio est-il optimal pour Discover ? (16:9 ou 1:1 = parfait ; trop portrait = pénalisé)
+2. technical_quality (18%) — Résolution, netteté, compression, absence d'artefacts
+3. visual_appeal (18%) — Attrait visuel de la carte Discover : composition, couleurs, sujet central clair
+4. discover_relevance (16%) — L'image correspond-elle à du contenu d'actualité / éditorial de qualité ?
+5. text_overlay (12%) — Score INVERSÉ : texte sur l'image (logos ok, titres = pénalité Google) — 10=pas de texte, 0=beaucoup de texte
+6. safe_search (10%) — Sécurité du contenu (10=totalement safe, 0=problématique)
+7. news_coherence (6%) — L'image s'associe-t-elle naturellement à un sujet d'actualité ?
+
+Fournis aussi :
+- analyse courte (2-3 phrases) des forces et faiblesses
+- 2-3 recommandations concrètes pour améliorer l'image pour Discover
+- og_image_verdict : "conforme" | "acceptable" | "à améliorer" | "non conforme"
+- detected_subject : description courte de ce que tu vois (en français)
+- estimated_dimensions : estimation du ratio (ex: "16:9", "4:3", "carré", "portrait")
+
+Réponds UNIQUEMENT en JSON valide sans markdown :
+{"scores":{"aspect_ratio":<f>,"technical_quality":<f>,"visual_appeal":<f>,"discover_relevance":<f>,"text_overlay":<f>,"safe_search":<f>,"news_coherence":<f>},"analysis":"<s>","improvements":["<s>","<s>","<s>"],"og_image_verdict":"<s>","detected_subject":"<s>","estimated_dimensions":"<s>"}`;
+
+async function analyzeImage(b64, mediaType) {
+  const r = await fetch("https://api.anthropic.com/v1/messages", {
+    method:"POST", headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({
+      model:"claude-sonnet-4-20250514", max_tokens:1000, temperature:0,
+      messages:[{role:"user", content:[
+        { type:"image", source:{ type:"base64", media_type: mediaType, data: b64 } },
+        { type:"text", text: IMG_PROMPT }
+      ]}]
+    })
+  });
+  if (!r.ok) throw new Error(`API ${r.status}: ${await r.text()}`);
+  const msg = await r.json();
+  let txt = msg.content[0].text.trim();
+  if (txt.startsWith('```')) txt = txt.replace(/^```(?:json)?\s*/,'').replace(/\s*```$/,'');
+  const p = JSON.parse(txt);
+  const scores = {};
+  for (const k in IMG_WEIGHTS) scores[k] = Math.max(0, Math.min(10, parseFloat(p.scores[k]||0)));
+  return {
+    scores, analysis: p.analysis||'', improvements: p.improvements||[],
+    og_verdict: p.og_image_verdict||'—', detected_subject: p.detected_subject||'—',
+    estimated_dimensions: p.estimated_dimensions||'—',
+    composite_score: computeImgScore(scores),
+  };
+}
+
+function renderImageCard(result, previewSrc) {
+  if (result.error) return `<div class="error-card">⚠ ${escapeHtml(result.error)}</div>`;
+  const cls = getImgScoreClass(result.composite_score);
+  const vCls = getVerdictClass(result.composite_score);
+  const vLabel = getVerdictLabel(result.composite_score);
+  const rows = Object.entries(result.scores).map(([k,v])=>`
+    <div class="score-row">
+      <div class="score-name">${IMG_LABELS[k]}</div>
+      <div class="score-bar-wrap"><div class="score-bar" style="width:${v*10}%;background:${getBarColor(v)}"></div></div>
+      <div class="score-num">${v.toFixed(1)}</div>
+    </div>`).join('');
+  const imps = result.improvements.map(s=>`<div class="improvement-item">${escapeHtml(s)}</div>`).join('');
+  const ogColor = result.og_verdict==='conforme'?'var(--green)':result.og_verdict==='acceptable'?'var(--accent)':result.og_verdict==='à améliorer'?'var(--accent2)':'var(--red)';
+
+  return `<div class="img-result-card">
+    <div class="img-card-header">
+      <div>
+        <div class="img-card-label">◈ Analyse image Discover</div>
+        <div style="margin-top:.5rem;"><span class="verdict-badge ${vCls}">${vLabel}</span></div>
+      </div>
+      <div>
+        <div class="img-score-big ${cls}">${result.composite_score.toFixed(1)}<span style="font-size:1.2rem;font-style:normal;color:var(--text-muted)">/10</span></div>
+        <div class="img-score-label">Score Discover</div>
+      </div>
+    </div>
+    <div class="img-card-body">
+      <div class="img-thumb-col">
+        <img class="img-thumb" src="${previewSrc}" alt="Image analysée">
+        <div class="img-tech-specs">
+          <div>Ratio : <b>${escapeHtml(result.estimated_dimensions)}</b></div>
+          <div>og:image : <b style="color:${ogColor}">${escapeHtml(result.og_verdict)}</b></div>
+          <div style="margin-top:.5rem;color:var(--text-dim);font-size:.6rem;line-height:1.6">${escapeHtml(result.detected_subject)}</div>
+        </div>
+      </div>
+      <div class="img-scores-col">
+        <div class="img-scores-grid">${rows}</div>
+      </div>
+    </div>
+    <div class="img-card-analysis">${escapeHtml(result.analysis)}</div>
+    ${imps?`<div class="img-card-improvements">${imps}</div>`:''}
+    <div class="img-card-meta">
+      <div class="meta-item">Score composite <b>${result.composite_score.toFixed(2)}</b></div>
+      <div class="meta-item">og:image <b style="color:${ogColor}">${escapeHtml(result.og_verdict)}</b></div>
+    </div>
+  </div>`;
+}
+
+const imgLoadingMsgs = [
+  'Analyse de l\'image via Claude Vision…',
+  'Évaluation du ratio et de la qualité…',
+  'Scoring des critères Discover…',
+  'Vérification safe search et texte…',
+];
+
+async function runImageAnalysis() {
+  if (!currentImageB64) return;
+  const btn = document.getElementById('analyzeImgBtn');
+  startLoading(btn, imgLoadingMsgs, true);
+  const previewSrc = document.getElementById('imagePreview').src;
+  let html = '';
+  try {
+    const result = await analyzeImage(currentImageB64, currentImageType);
+    html = renderImageCard(result, previewSrc);
+  } catch(e) {
+    html = `<div class="error-card">⚠ ${escapeHtml(e.message)}</div>`;
+  }
+  showResults(html, '1 résultat');
+  stopLoading(btn);
+}
+
+/* ═══════════════════════════════════════
+   LOADING / RESULTS HELPERS
+═══════════════════════════════════════ */
+let _loadingInterval = null;
+
+function startLoading(btn, messages, isImg) {
+  btn.disabled = true;
+  const loadingEl = document.getElementById('loadingState');
+  const bar = document.getElementById('loadingBar');
+  const txt = document.getElementById('loadingText');
+  if (isImg) bar.classList.add('img-bar'); else bar.classList.remove('img-bar');
+  loadingEl.classList.add('active');
+  document.getElementById('resultsSection').style.display = 'none';
+  txt.textContent = messages[0];
+  let idx = 0;
+  _loadingInterval = setInterval(() => {
+    idx = (idx+1) % messages.length;
+    txt.textContent = messages[idx];
+  }, 1500);
+}
+
+function stopLoading(btn) {
+  clearInterval(_loadingInterval);
+  document.getElementById('loadingState').classList.remove('active');
+  btn.disabled = false;
+}
+
+function showResults(html, countStr) {
+  const sec = document.getElementById('resultsSection');
+  const hdr = document.getElementById('resultsHeader');
+  const ctn = document.getElementById('resultsContainer');
+  hdr.dataset.count = countStr;
+  ctn.innerHTML = html;
+  sec.style.display = 'block';
+  sec.scrollIntoView({behavior:'smooth', block:'start'});
+}
+</script>
+</body>
+</html>

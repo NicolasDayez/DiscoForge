@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DiscoForge — Optimisez vos contenus pour Google Discover</title>
+<meta name="description" content="Prédit le pCTR de vos titres et analyse vos images pour Google Discover. Alimenté par Claude AI.">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Instrument+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f5f2eb;
+  --ink: #0e0d0b;
+  --ink2: #3a3832;
+  --ink3: #8a8780;
+  --ink4: #c4c1b8;
+  --accent: #d4380d;
+  --accent2: #1a6b3a;
+  --surface: #eeeae0;
+  --surface2: #e6e2d6;
+  --border: #d4d0c4;
+  --border2: #c0bbb0;
+  --gold: #b8860b;
+  --serif: 'Playfair Display', serif;
+  --sans: 'Instrument Sans', sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--ink); font-family: var(--sans); font-weight: 300; overflow-x: hidden; }
+body::after {
+  content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 9999;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  opacity: 0.6;
+}
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  padding: 1.1rem 3rem; display: flex; align-items: center; justify-content: space-between;
+  background: rgba(245,242,235,0.92); backdrop-filter: blur(14px); border-bottom: 1px solid var(--border);
+}
+.nav-logo { font-family: var(--serif); font-size: 1.4rem; font-weight: 700; color: var(--ink); text-decoration: none; letter-spacing: -0.02em; display: flex; align-items: center; gap: 0.5rem; }
+.nav-logo-dot { width: 7px; height: 7px; background: var(--accent); border-radius: 50%; animation: blink-dot 2.5s ease-in-out infinite; }
+@keyframes blink-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.3)} }
+.nav-links { display: flex; align-items: center; gap: 2rem; }
+.nav-links a { font-size: .82rem; color: var(--ink2); text-decoration: none; font-weight: 400; letter-spacing: .04em; transition: color .15s; }
+.nav-links a:hover { color: var(--accent); }
+.nav-cta { background: var(--ink); color: var(--bg); padding: .55rem 1.4rem; border-radius: 2px; font-size: .78rem; font-weight: 500; letter-spacing: .06em; text-decoration: none; transition: background .18s; font-family: var(--mono); }
+.nav-cta:hover { background: var(--accent); color: #fff; }
+.ticker-wrap { background: var(--ink); padding: .65rem 0; overflow: hidden; }
+.ticker-track { display: flex; white-space: nowrap; animation: ticker 24s linear infinite; }
+.ticker-item { font-family: var(--mono); font-size: .62rem; letter-spacing: .14em; text-transform: uppercase; color: rgba(245,242,235,.3); padding: 0 2.5rem; }
+.ticker-item span { color: var(--accent); margin-right: .6rem; }
+@keyframes ticker { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+.hero { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; padding: 7rem 3rem 5rem; max-width: 1100px; margin: 0 auto; }
+.hero-kicker { font-family: var(--mono); font-size: .68rem; letter-spacing: .2em; text-transform: uppercase; color: var(--accent); margin-bottom: 2rem; display: flex; align-items: center; gap: .8rem; animation: fade-up .6s ease both; }
+.hero-kicker::before { content:''; width:2.5rem; height:1px; background:var(--accent); }
+.hero h1 { font-family: var(--serif); font-size: clamp(3rem, 7vw, 6.2rem); line-height: 1.03; letter-spacing: -0.03em; font-weight: 700; margin-bottom: 2rem; max-width: 760px; animation: fade-up .7s .1s ease both; }
+.hero h1 em { font-style: italic; color: var(--accent); }
+.hero h1 u { text-decoration: underline; text-decoration-color: var(--border2); text-underline-offset: 6px; }
+.hero-sub { font-size: 1.08rem; color: var(--ink2); line-height: 1.78; max-width: 500px; margin-bottom: 3rem; font-weight: 300; animation: fade-up .7s .2s ease both; }
+.hero-actions { display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap; animation: fade-up .7s .3s ease both; }
+.btn-primary { background: var(--ink); color: var(--bg); padding: 1rem 2.4rem; font-family: var(--mono); font-size: .82rem; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; text-decoration: none; border-radius: 2px; transition: all .18s; display: inline-flex; align-items: center; gap: .6rem; }
+.btn-primary:hover { background: var(--accent); transform: translateY(-2px); box-shadow: 0 10px 28px rgba(212,56,13,.22); }
+.btn-secondary { font-size: .85rem; color: var(--ink2); text-decoration: none; font-weight: 400; border-bottom: 1px solid var(--border2); padding-bottom: 2px; transition: color .15s, border-color .15s; }
+.btn-secondary:hover { color: var(--accent); border-color: var(--accent); }
+.roi-strip { margin-top: 4.5rem; padding-top: 2.5rem; border-top: 1px solid var(--border); display: grid; grid-template-columns: 1fr auto; gap: 2rem; align-items: center; animation: fade-up .7s .4s ease both; }
+.roi-label { font-family: var(--mono); font-size: .63rem; letter-spacing: .14em; text-transform: uppercase; color: var(--ink3); margin-bottom: .8rem; }
+.roi-calc { display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap; }
+.roi-item { text-align: center; }
+.roi-num { font-family: var(--serif); font-size: 2.2rem; font-weight: 700; letter-spacing: -.03em; line-height: 1; }
+.roi-num.red { color: var(--accent); }
+.roi-num.green { color: var(--accent2); }
+.roi-desc { font-size: .6rem; color: var(--ink3); margin-top: .25rem; font-family: var(--mono); letter-spacing: .08em; text-transform: uppercase; }
+.roi-sep { font-family: var(--serif); font-size: 1.8rem; color: var(--border2); }
+.roi-verdict { background: var(--ink); color: var(--bg); padding: 1.2rem 1.6rem; border-radius: 2px; max-width: 220px; font-size: .76rem; line-height: 1.7; font-family: var(--mono); }
+.roi-verdict strong { color: var(--accent); display: block; font-size: .82rem; margin-bottom: .3rem; }
+@keyframes fade-up { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+.blind-band { background: var(--ink); color: var(--bg); padding: 5rem 3rem; border-top: 1px solid #1a1a18; border-bottom: 1px solid #1a1a18; }
+.blind-headline { max-width: 1100px; margin: 0 auto 3rem; }
+.blind-headline-kicker { font-family: var(--mono); font-size: .63rem; letter-spacing: .2em; text-transform: uppercase; color: rgba(245,242,235,.3); margin-bottom: .8rem; display: flex; align-items: center; gap: .6rem; }
+.blind-headline-kicker::before { content:''; width:1.5rem; height:1px; background:rgba(245,242,235,.2); }
+.blind-headline h2 { font-family: var(--serif); font-size: clamp(1.8rem,3.5vw,2.8rem); line-height: 1.1; letter-spacing: -.02em; font-weight: 700; }
+.blind-headline h2 em { font-style: italic; color: var(--accent); }
+.blind-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 2px; }
+.blind-col { padding: 2.5rem 2.8rem; }
+.blind-col.before { background: #151513; }
+.blind-col.after { background: #1a1f16; }
+.blind-tag { font-family: var(--mono); font-size: .6rem; letter-spacing: .16em; text-transform: uppercase; margin-bottom: 1.5rem; padding: .22rem .6rem; border-radius: 2px; display: inline-block; }
+.blind-tag.bt { background: rgba(255,77,77,.12); color: #ff7070; }
+.blind-tag.at { background: rgba(74,222,128,.12); color: #6ee7a8; }
+.blind-title { font-family: var(--serif); font-size: 1.3rem; line-height: 1.35; letter-spacing: -.01em; margin-bottom: 1.5rem; color: rgba(245,242,235,.7); }
+.blind-col.after .blind-title { color: var(--bg); }
+.blind-metrics { display: flex; flex-direction: column; gap: .55rem; }
+.bm-row { display: flex; align-items: center; gap: .7rem; }
+.bm-label { font-family: var(--mono); font-size: .62rem; letter-spacing: .08em; text-transform: uppercase; color: rgba(245,242,235,.28); width: 90px; }
+.bm-bar-wrap { flex:1; height:3px; background:rgba(255,255,255,.06); border-radius:2px; overflow:hidden; }
+.bm-bar { height:100%; border-radius:2px; }
+.bm-val { font-family: var(--mono); font-size: .65rem; width: 3em; text-align: right; }
+.blind-pctr { font-family: var(--serif); font-size: 2.6rem; font-weight: 700; font-style: italic; letter-spacing: -.03em; margin-top: 1.5rem; }
+.blind-col.before .blind-pctr { color: #ff6060; }
+.blind-col.after .blind-pctr { color: #6ee7a8; }
+.blind-pctr-label { font-family: var(--mono); font-size: .57rem; letter-spacing: .14em; text-transform: uppercase; color: rgba(245,242,235,.28); margin-top: .2rem; }
+section { padding: 6rem 3rem; }
+.section-wrap { max-width: 1100px; margin: 0 auto; }
+.section-kicker { font-family: var(--mono); font-size: .63rem; letter-spacing: .2em; text-transform: uppercase; color: var(--ink3); margin-bottom: 1rem; display: flex; align-items: center; gap: .6rem; }
+.section-kicker::before { content:''; width:1.5rem; height:1px; background:var(--ink3); }
+.section-title { font-family: var(--serif); font-size: clamp(2rem,4vw,3rem); line-height: 1.1; letter-spacing: -.02em; font-weight: 700; margin-bottom: 1.2rem; }
+.section-title em { font-style: italic; color: var(--accent); }
+.steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px,1fr)); gap:0; margin-top: 4rem; border:1px solid var(--border); border-radius:2px; overflow:hidden; }
+.step { padding: 2.2rem 2rem; border-right:1px solid var(--border); transition:background .2s; }
+.step:last-child { border-right:none; }
+.step:hover { background: var(--surface2); }
+.step-num { font-family: var(--mono); font-size: .6rem; letter-spacing: .14em; text-transform: uppercase; color: var(--ink4); margin-bottom: 1.2rem; }
+.step-icon { font-size: 1.5rem; margin-bottom: .8rem; }
+.step h3 { font-family: var(--serif); font-size: 1.15rem; font-weight: 700; margin-bottom: .55rem; letter-spacing: -.01em; }
+.step p { font-size: .82rem; color: var(--ink2); line-height: 1.7; }
+#features { background: var(--bg); }
+.features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px,1fr)); gap:1px; margin-top: 4rem; background: var(--border); border:1px solid var(--border); border-radius:2px; overflow:hidden; }
+.feature-card { background: var(--bg); padding: 2.2rem; transition: background .18s; }
+.feature-card:hover { background: var(--surface); }
+.feature-tag { font-family: var(--mono); font-size: .6rem; letter-spacing: .14em; text-transform: uppercase; color: var(--accent2); margin-bottom: 1rem; display: inline-block; background: rgba(26,107,58,.08); padding: .2rem .5rem; border-radius: 2px; }
+.feature-tag.red { color: var(--accent); background: rgba(212,56,13,.07); }
+.feature-tag.gold { color: var(--gold); background: rgba(184,134,11,.07); }
+.feature-tag.pro { color: #7c3aed; background: rgba(124,58,237,.07); }
+.feature-card h3 { font-family: var(--serif); font-size: 1.1rem; font-weight: 700; margin-bottom: .65rem; letter-spacing: -.01em; }
+.feature-card p { font-size: .82rem; color: var(--ink2); line-height: 1.72; }
+.feature-dims { margin-top: 1rem; display: flex; flex-wrap: wrap; gap: .3rem; }
+.dim-pill { font-family: var(--mono); font-size: .57rem; letter-spacing: .08em; text-transform: uppercase; background: var(--surface); border: 1px solid var(--border); padding: .17rem .48rem; border-radius: 2rem; color: var(--ink3); }
+#pricing { background: var(--surface); border-top: 1px solid var(--border); }
+.pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px,1fr)); gap: 1.2rem; max-width: 1050px; margin-top: 0; }
+.plan-card { background: var(--bg); border: 1px solid var(--border); border-radius: 3px; padding: 2.3rem; position: relative; transition: transform .2s, box-shadow .2s; display: flex; flex-direction: column; }
+.plan-card:hover { transform: translateY(-3px); box-shadow: 0 16px 40px rgba(14,13,11,.1); }
+.plan-card.featured { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.plan-badge { position: absolute; top:-1px; right:1.4rem; font-family:var(--mono); font-size:.57rem; letter-spacing:.14em; text-transform:uppercase; background:var(--accent); color:#fff; padding:.25rem .65rem; border-radius:0 0 3px 3px; }
+.plan-badge.gold-badge { background: var(--gold); }
+.plan-name { font-family:var(--mono); font-size:.63rem; letter-spacing:.16em; text-transform:uppercase; margin-bottom:1.2rem; }
+.plan-card.featured .plan-name { color: rgba(245,242,235,.4); }
+.plan-price { font-family:var(--serif); font-size:2.8rem; font-weight:700; line-height:1; letter-spacing:-.04em; margin-bottom:.25rem; }
+.plan-price sup { font-size:1.1rem; vertical-align:super; font-weight:400; }
+.plan-period { font-family:var(--mono); font-size:.62rem; letter-spacing:.1em; text-transform:uppercase; color:var(--ink3); margin-bottom:1.5rem; }
+.plan-card.featured .plan-period { color: rgba(245,242,235,.3); }
+.plan-tagline { font-size:.82rem; line-height:1.65; color:var(--ink2); margin-bottom:1.5rem; font-style:italic; }
+.plan-card.featured .plan-tagline { color: rgba(245,242,235,.5); }
+.plan-divider { height:1px; background:var(--border); margin-bottom:1.5rem; }
+.plan-card.featured .plan-divider { background: rgba(245,242,235,.12); }
+.plan-features { list-style:none; display:flex; flex-direction:column; gap:.7rem; margin-bottom:2rem; flex:1; }
+.plan-features li { display:flex; align-items:flex-start; gap:.6rem; font-size:.82rem; line-height:1.5; }
+.plan-features li::before { content:'✓'; font-family:var(--mono); font-size:.72rem; color:var(--accent2); flex-shrink:0; margin-top:.1rem; }
+.plan-card.featured .plan-features li::before { color: #6ee7a8; }
+.plan-card.featured .plan-features li { color: rgba(245,242,235,.8); }
+.plan-features li.no::before { content:'—'; color:var(--ink4); }
+.plan-features li.no { color: var(--ink4); }
+.plan-features li.star::before { content:'★'; color:var(--gold); }
+.plan-btn { display:block; width:100%; text-align:center; padding:.85rem; font-family:var(--mono); font-size:.73rem; font-weight:500; letter-spacing:.1em; text-transform:uppercase; text-decoration:none; border-radius:2px; transition:all .18s; cursor:pointer; border:none; }
+.btn-outline { background:transparent; color:var(--ink); border:1px solid var(--border2); }
+.btn-outline:hover { border-color:var(--ink); background:var(--ink); color:var(--bg); }
+.btn-solid { background:var(--accent); color:#fff; }
+.btn-solid:hover { background:#b52e08; }
+.btn-inv { background:var(--bg); color:var(--ink); }
+.btn-inv:hover { background:var(--accent); color:#fff; }
+.btn-gold { background:var(--gold); color:#fff; }
+.btn-gold:hover { background:#9a7009; }
+.pass-spotlight { max-width:1050px; margin-top:1.4rem; background:var(--ink); border-radius:3px; padding:2rem 2.5rem; display:grid; grid-template-columns:1fr auto; gap:2rem; align-items:center; }
+.pass-kicker { font-family:var(--mono); font-size:.6rem; letter-spacing:.18em; text-transform:uppercase; color:var(--gold); margin-bottom:.6rem; }
+.pass-title { font-family:var(--serif); font-size:1.5rem; font-weight:700; color:var(--bg); letter-spacing:-.01em; margin-bottom:.5rem; }
+.pass-desc { font-size:.82rem; color:rgba(245,242,235,.45); line-height:1.72; }
+.pass-price { font-family:var(--serif); font-size:3rem; font-weight:700; color:var(--bg); line-height:1; letter-spacing:-.04em; }
+.pass-price sup { font-size:1.2rem; vertical-align:super; font-weight:400; }
+.pass-period { font-family:var(--mono); font-size:.6rem; letter-spacing:.12em; text-transform:uppercase; color:rgba(245,242,235,.3); margin-bottom:1.2rem; text-align:right; }
+.roi-box { max-width:1050px; margin-top:2.5rem; background:#fffdf5; border:1px solid #e0d8b0; border-radius:3px; padding:2rem 2.5rem; }
+.roi-box-title { font-family:var(--serif); font-size:1.2rem; font-weight:700; margin-bottom:1.2rem; letter-spacing:-.01em; }
+.roi-box-title em { font-style:italic; color:var(--accent); }
+.roi-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:1rem 2rem; }
+.roi-cell-num { font-family:var(--serif); font-size:1.8rem; font-weight:700; letter-spacing:-.02em; }
+.roi-cell-num.green { color:var(--accent2); }
+.roi-cell-num.red { color:var(--accent); }
+.roi-cell-label { font-family:var(--mono); font-size:.6rem; letter-spacing:.1em; text-transform:uppercase; color:var(--ink3); margin-top:.2rem; }
+.roi-conclusion { margin-top:1.2rem; font-size:.84rem; color:var(--ink2); line-height:1.75; border-top:1px solid #e0d8b0; padding-top:1rem; }
+.roi-conclusion strong { color:var(--accent2); }
+.pricing-note { max-width:1050px; margin-top:1.2rem; font-family:var(--mono); font-size:.62rem; letter-spacing:.08em; color:var(--ink3); }
+#faq { border-top:1px solid var(--border); }
+.faq-list { margin-top:3.5rem; max-width:680px; }
+.faq-item { border-bottom:1px solid var(--border); }
+.faq-q { padding:1.35rem 0; font-size:.93rem; font-weight:500; cursor:pointer; display:flex; align-items:center; justify-content:space-between; gap:1rem; transition:color .15s; user-select:none; }
+.faq-q:hover { color:var(--accent); }
+.faq-toggle { font-family:var(--mono); font-size:1rem; color:var(--ink3); flex-shrink:0; transition:transform .2s; }
+.faq-item.open .faq-toggle { transform:rotate(45deg); }
+.faq-a { display:none; padding-bottom:1.35rem; font-size:.85rem; color:var(--ink2); line-height:1.82; }
+.faq-item.open .faq-a { display:block; }
+#cta { background:var(--ink); color:var(--bg); text-align:center; border-top:1px solid #1a1a18; }
+.cta-title { font-family:var(--serif); font-size:clamp(2.2rem,5vw,3.8rem); line-height:1.08; letter-spacing:-.03em; font-weight:700; margin-bottom:1.4rem; }
+.cta-title em { font-style:italic; color:var(--accent); }
+.cta-sub { font-size:.93rem; color:rgba(245,242,235,.42); line-height:1.78; margin-bottom:2.5rem; }
+.cta-actions { display:flex; align-items:center; justify-content:center; gap:1.2rem; flex-wrap:wrap; }
+.btn-cta-light { background:var(--bg); color:var(--ink); padding:1rem 2.4rem; font-family:var(--mono); font-size:.8rem; font-weight:500; letter-spacing:.08em; text-transform:uppercase; text-decoration:none; border-radius:2px; transition:all .18s; }
+.btn-cta-light:hover { background:var(--accent); color:#fff; transform:translateY(-2px); }
+.btn-cta-ghost { font-size:.85rem; color:rgba(245,242,235,.38); text-decoration:none; border-bottom:1px solid rgba(245,242,235,.15); padding-bottom:2px; transition:all .15s; }
+.btn-cta-ghost:hover { color:var(--bg); border-color:var(--bg); }
+footer { background:var(--ink); border-top:1px solid #1a1a18; padding:1.8rem 3rem; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem; }
+.footer-logo { font-family:var(--serif); font-size:1.1rem; color:rgba(245,242,235,.28); }
+.footer-links { display:flex; gap:2rem; }
+.footer-links a { font-family:var(--mono); font-size:.6rem; letter-spacing:.1em; text-transform:uppercase; color:rgba(245,242,235,.18); text-decoration:none; transition:color .15s; }
+.footer-links a:hover { color:rgba(245,242,235,.55); }
+.footer-copy { font-family:var(--mono); font-size:.58rem; letter-spacing:.08em; color:rgba(245,242,235,.15); text-transform:uppercase; }
+.reveal { opacity:0; transform:translateY(22px); transition:opacity .58s ease, transform .58s ease; }
+.reveal.visible { opacity:1; transform:translateY(0); }
+@media (max-width:720px) {
+  nav { padding:1rem 1.4rem; } .nav-links { display:none; }
+  .hero, section, .blind-band { padding-left:1.4rem; padding-right:1.4rem; }
+  .hero { padding-top:6rem; } .blind-inner { grid-template-columns:1fr; }
+  .roi-strip, .pass-spotlight { grid-template-columns:1fr; }
+  .pass-period { text-align:left; } footer { flex-direction:column; align-items:flex-start; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="#" class="nav-logo">DiscoForge <span class="nav-logo-dot"></span></a>
+  <div class="nav-links">
+    <a href="#compare">Avant / Après</a>
+    <a href="#features">Fonctionnalités</a>
+    <a href="#pricing">Tarifs</a>
+    <a href="#faq">FAQ</a>
+  </div>
+  <a href="discoforge.html" class="nav-cta">Essai gratuit →</a>
+</nav>
+
+<div style="margin-top:62px;">
+  <div class="ticker-wrap">
+    <div class="ticker-track">
+      <span class="ticker-item"><span>✦</span>Analyse pCTR titre</span>
+      <span class="ticker-item"><span>◈</span>Scoring image Discover</span>
+      <span class="ticker-item"><span>✦</span>Pénalité clickbait β</span>
+      <span class="ticker-item"><span>◈</span>8 dimensions qualité</span>
+      <span class="ticker-item"><span>✦</span>Vérification og:image</span>
+      <span class="ticker-item"><span>◈</span>Knowledge Graph entities</span>
+      <span class="ticker-item"><span>✦</span>Score fraîcheur news</span>
+      <span class="ticker-item"><span>◈</span>Multilingue</span>
+      <span class="ticker-item"><span>✦</span>Analyse pCTR titre</span>
+      <span class="ticker-item"><span>◈</span>Scoring image Discover</span>
+      <span class="ticker-item"><span>✦</span>Pénalité clickbait β</span>
+      <span class="ticker-item"><span>◈</span>8 dimensions qualité</span>
+      <span class="ticker-item"><span>✦</span>Vérification og:image</span>
+      <span class="ticker-item"><span>◈</span>Knowledge Graph entities</span>
+      <span class="ticker-item"><span>✦</span>Score fraîcheur news</span>
+      <span class="ticker-item"><span>◈</span>Multilingue</span>
+    </div>
+  </div>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-kicker">Optimisation Google Discover</div>
+  <h1>Ne publiez plus<br><em>à l'aveugle</em><br>sur <u>Discover</u></h1>
+  <p class="hero-sub">DiscoForge prédit le taux de clic de vos titres avant publication — et analyse vos images og pour maximiser votre visibilité sur Google Discover.</p>
+  <div class="hero-actions">
+    <a href="discoforge.html" class="btn-primary">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6h8M6 2l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Analyser gratuitement
+    </a>
+    <a href="#pricing" class="btn-secondary">Voir les tarifs →</a>
+  </div>
+  <div class="roi-strip">
+    <div>
+      <div class="roi-label">Le calcul qui change tout</div>
+      <div class="roi-calc">
+        <div class="roi-item"><div class="roi-num">+1%</div><div class="roi-desc">CTR gagné</div></div>
+        <div class="roi-sep">×</div>
+        <div class="roi-item"><div class="roi-num">50k</div><div class="roi-desc">impressions/mois</div></div>
+        <div class="roi-sep">=</div>
+        <div class="roi-item"><div class="roi-num red">+500</div><div class="roi-desc">clics/mois</div></div>
+        <div class="roi-sep">→</div>
+        <div class="roi-item"><div class="roi-num green">25€</div><div class="roi-desc">valeur traffic</div></div>
+      </div>
+    </div>
+    <div class="roi-verdict">
+      <strong>Rentabilisé en 1 jour</strong>
+      DiscoForge Pro 29€/mois =<br>+1% CTR sur 1 article suffit.
+    </div>
+  </div>
+</div>
+
+<!-- BEFORE / AFTER -->
+<div id="compare" class="blind-band">
+  <div class="blind-headline reveal">
+    <div class="blind-headline-kicker">Avant · Après</div>
+    <h2>Le même article.<br><em>Deux destins différents.</em></h2>
+  </div>
+  <div class="blind-inner reveal">
+    <div class="blind-col before">
+      <div class="blind-tag bt">✗ Sans DiscoForge</div>
+      <div class="blind-title">"Les choses à savoir sur la nouvelle mise à jour qui va tout changer pour vous"</div>
+      <div class="blind-metrics">
+        <div class="bm-row"><span class="bm-label">Entités KG</span><div class="bm-bar-wrap"><div class="bm-bar" style="width:15%;background:#ff6060"></div></div><span class="bm-val" style="color:#ff6060">1.5</span></div>
+        <div class="bm-row"><span class="bm-label">Clarté</span><div class="bm-bar-wrap"><div class="bm-bar" style="width:20%;background:#ff8c42"></div></div><span class="bm-val" style="color:#ff8c42">2.0</span></div>
+        <div class="bm-row"><span class="bm-label">Clickbait β</span><div class="bm-bar-wrap"><div class="bm-bar" style="width:85%;background:#ff6060"></div></div><span class="bm-val" style="color:#ff6060">8.5</span></div>
+      </div>
+      <div class="blind-pctr">3.1%</div>
+      <div class="blind-pctr-label">pCTR estimé</div>
+    </div>
+    <div class="blind-col after">
+      <div class="blind-tag at">✓ Avec DiscoForge</div>
+      <div class="blind-title">"Google déploie Helpful Content 3.0 : ce que ça change pour les éditeurs"</div>
+      <div class="blind-metrics">
+        <div class="bm-row"><span class="bm-label">Entités KG</span><div class="bm-bar-wrap"><div class="bm-bar" style="width:85%;background:#6ee7a8"></div></div><span class="bm-val" style="color:#6ee7a8">8.5</span></div>
+        <div class="bm-row"><span class="bm-label">Clarté</span><div class="bm-bar-wrap"><div class="bm-bar" style="width:90%;background:#6ee7a8"></div></div><span class="bm-val" style="color:#6ee7a8">9.0</span></div>
+        <div class="bm-row"><span class="bm-label">Clickbait β</span><div class="bm-bar-wrap"><div class="bm-bar" style="width:10%;background:#6ee7a8"></div></div><span class="bm-val" style="color:#6ee7a8">1.0</span></div>
+      </div>
+      <div class="blind-pctr">14.8%</div>
+      <div class="blind-pctr-label">pCTR estimé</div>
+    </div>
+  </div>
+</div>
+
+<!-- HOW -->
+<section id="how" style="background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
+  <div class="section-wrap">
+    <div class="reveal">
+      <div class="section-kicker">Processus</div>
+      <h2 class="section-title">Résultat en<br><em>moins de 5 secondes</em></h2>
+    </div>
+    <div class="steps reveal">
+      <div class="step"><div class="step-num">01</div><div class="step-icon">✍️</div><h3>Collez vos titres</h3><p>Jusqu'à 5 titres en une fois. Toutes langues nativement supportées.</p></div>
+      <div class="step"><div class="step-num">02</div><div class="step-icon">🖼️</div><h3>Uploadez l'image og</h3><p>Claude Vision analyse ratio, qualité, texte superposé et verdict og:image. <em>Plan Pro.</em></p></div>
+      <div class="step"><div class="step-num">03</div><div class="step-icon">⚡</div><h3>Lisez le score</h3><p>pCTR prédit, 8 dimensions scorées, pénalité β, recommandations concrètes.</p></div>
+      <div class="step"><div class="step-num">04</div><div class="step-icon">🎯</div><h3>Optimisez & publiez</h3><p>Appliquez les suggestions, relancez jusqu'au score cible.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="section-wrap">
+    <div class="reveal">
+      <div class="section-kicker">Fonctionnalités</div>
+      <h2 class="section-title">Un moteur dual.<br><em>Titres + Images.</em></h2>
+    </div>
+    <div class="features-grid reveal">
+      <div class="feature-card"><span class="feature-tag red">✦ Titres · pCTR</span><h3>Prédiction taux de clic</h3><p>Modèle sigmoid calibré sur le pipeline Discover. pCTR entre 0,5% et 22%, pondéré sur 8 dimensions avec pénalité β clickbait.</p><div class="feature-dims"><span class="dim-pill">Entités KG</span><span class="dim-pill">Clarté</span><span class="dim-pill">Valeur info</span><span class="dim-pill">Fraîcheur</span><span class="dim-pill">Engagement</span><span class="dim-pill">Formatage</span><span class="dim-pill">Autorité</span><span class="dim-pill">Visuel</span></div></div>
+      <div class="feature-card"><span class="feature-tag pro">◈ Image · Pro only</span><h3>Analyse image Discover</h3><p>Claude Vision inspecte ratio, qualité technique, texte incrusté et safe search. Verdict og:image exploitable immédiatement.</p><div class="feature-dims"><span class="dim-pill">Ratio 16:9</span><span class="dim-pill">Qualité tech</span><span class="dim-pill">Texte image</span><span class="dim-pill">Safe search</span><span class="dim-pill">Cohérence actu</span></div></div>
+      <div class="feature-card"><span class="feature-tag gold">β Blindness factor</span><h3>Détection clickbait avancée</h3><p>Google pénalise les titres qui génèrent des bounces rapides. Notre facteur β simule ce mécanisme de dégradation progressive du pCTR.</p></div>
+      <div class="feature-card"><span class="feature-tag">→ Suggestions IA</span><h3>Reformulations concrètes</h3><p>Pas de conseils vagues. Chaque analyse produit 2 reformulations directes pour hisser votre titre au niveau Pro Discover.</p></div>
+      <div class="feature-card"><span class="feature-tag">🌍 Multilingue</span><h3>Toutes langues</h3><p>Français, anglais, turc, espagnol, allemand, arabe… Le moteur détecte et s'adapte automatiquement à la langue du titre.</p></div>
+      <div class="feature-card"><span class="feature-tag red">⚡ Temps réel</span><h3>Résultats instantanés</h3><p>Moins de 5 secondes par analyse via Claude Sonnet 4. Conçu pour un workflow éditorial sous pression quotidienne.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div class="section-wrap">
+    <div class="reveal" style="margin-bottom:3rem;">
+      <div class="section-kicker">Tarifs</div>
+      <h2 class="section-title">Simple.<br><em>Sans surprise.</em></h2>
+      <p style="font-size:.93rem;color:var(--ink2);line-height:1.78;max-width:480px;">L'analyse image — notre fonctionnalité la plus puissante — est réservée au Plan Pro. C'est elle qui coûte le plus en API et qui génère le plus de valeur.</p>
+    </div>
+    <div class="pricing-grid reveal">
+      <div class="plan-card">
+        <div class="plan-name">Starter</div>
+        <div class="plan-price"><sup>€</sup>0</div>
+        <div class="plan-period">Pour toujours</div>
+        <div class="plan-tagline">Pour tester et se convaincre.</div>
+        <div class="plan-divider"></div>
+        <ul class="plan-features">
+          <li>5 analyses titres / mois</li>
+          <li>Score pCTR complet (8 dim.)</li>
+          <li>Pénalité clickbait β</li>
+          <li>Recommandations IA</li>
+          <li class="no">Analyse image Discover</li>
+          <li class="no">Historique des analyses</li>
+          <li class="no">Export CSV</li>
+        </ul>
+        <a href="discoforge.html" class="plan-btn btn-outline">Commencer gratuit</a>
+      </div>
+      <div class="plan-card featured">
+        <div class="plan-badge">Recommandé</div>
+        <div class="plan-name">Pro</div>
+        <div class="plan-price"><sup>€</sup>29</div>
+        <div class="plan-period">par mois · sans engagement</div>
+        <div class="plan-tagline">Freelances SEO, éditeurs de niche.</div>
+        <div class="plan-divider"></div>
+        <ul class="plan-features">
+          <li>200 analyses titres / mois</li>
+          <li>Score pCTR complet (8 dim.)</li>
+          <li>Pénalité clickbait β</li>
+          <li>Recommandations IA</li>
+          <li class="star">Analyse image Discover ★</li>
+          <li>Historique 90 jours</li>
+          <li>Export CSV</li>
+        </ul>
+        <a href="#" class="plan-btn btn-solid" onclick="alert('Paiement bientôt disponible via Stripe !')">Passer Pro</a>
+      </div>
+      <div class="plan-card">
+        <div class="plan-name">Équipe</div>
+        <div class="plan-price"><sup>€</sup>99</div>
+        <div class="plan-period">par mois · 5 sièges</div>
+        <div class="plan-tagline">Rédactions et agences presse.</div>
+        <div class="plan-divider"></div>
+        <ul class="plan-features">
+          <li>Tout le plan Pro</li>
+          <li>5 comptes rédacteurs</li>
+          <li>Analyses illimitées</li>
+          <li class="star">Analyse image Discover ★</li>
+          <li>Historique 12 mois</li>
+          <li>Export CSV + PDF rapport</li>
+          <li>Support prioritaire</li>
+        </ul>
+        <a href="mailto:contact@discoforge.io" class="plan-btn btn-outline">Nous contacter</a>
+      </div>
+    </div>
+
+    <!-- PASS 24H -->
+    <div class="pass-spotlight reveal">
+      <div>
+        <div class="pass-kicker">⚡ Accès flash · Sans abonnement</div>
+        <div class="pass-title">Pass News Day — 24h illimité</div>
+        <div class="pass-desc">Un gros dossier à sortir aujourd'hui ? Accès illimité titres + images pendant 24 heures. Payez, analysez, publiez. Aucun engagement.</div>
+      </div>
+      <div style="text-align:right;flex-shrink:0;">
+        <div class="pass-price"><sup>€</sup>9</div>
+        <div class="pass-period">accès 24 heures</div>
+        <a href="#" class="plan-btn btn-gold" style="min-width:160px;" onclick="alert('Bientôt disponible via Stripe !')">Acheter le Pass</a>
+      </div>
+    </div>
+
+    <!-- ROI BOX -->
+    <div class="roi-box reveal">
+      <div class="roi-box-title">Le calcul du <em>ROI réel</em></div>
+      <div class="roi-grid">
+        <div><div class="roi-cell-num">+1%</div><div class="roi-cell-label">CTR gagné</div></div>
+        <div><div class="roi-cell-num">50 000</div><div class="roi-cell-label">Impressions/mois</div></div>
+        <div><div class="roi-cell-num red">+500</div><div class="roi-cell-label">Clics supplémentaires</div></div>
+        <div><div class="roi-cell-num green">25 €</div><div class="roi-cell-label">Valeur traffic (0,05€/clic)</div></div>
+      </div>
+      <div class="roi-conclusion">DiscoForge Pro à 29€/mois est rentabilisé si vous gagnez <strong>+1% de CTR sur un seul article à 50 000 impressions</strong>. Pour une rédaction publiant 20 articles/semaine, le retour est immédiat dès le premier jour d'utilisation.</div>
+    </div>
+    <p class="pricing-note reveal">✓ Paiement sécurisé Stripe · Annulation en 1 clic · Facture TVA automatique</p>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq">
+  <div class="section-wrap">
+    <div class="reveal">
+      <div class="section-kicker">Questions fréquentes</div>
+      <h2 class="section-title">Tout ce que vous<br><em>voulez savoir</em></h2>
+    </div>
+    <div class="faq-list reveal">
+      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">Pourquoi l'analyse image est réservée au Pro ?<span class="faq-toggle">+</span></div><div class="faq-a">L'analyse d'image utilise Claude Vision — un modèle multimodal plus coûteux en API. C'est aussi notre fonctionnalité la plus différenciante : peu d'outils Discover vérifient la conformité og:image de façon aussi granulaire. Elle est réservée au Pro pour valoriser l'abonnement à sa juste mesure.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">Le score pCTR est-il fiable ?<span class="faq-toggle">+</span></div><div class="faq-a">Le modèle est calibré sur la documentation publique du pipeline Discover en 9 étapes de Google et les signaux connus : entités Knowledge Graph, freshness buckets, pénalité clickbait. C'est un indicateur prédictif, pas une valeur certifiée — mais il reflète fidèlement les critères de ranking documentés.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">À quoi sert le Pass News Day à 9€ ?<span class="faq-toggle">+</span></div><div class="faq-a">Pour les rédacteurs ou freelances avec un gros dossier ponctuel à optimiser sans vouloir s'abonner. 9€ pour 24h d'accès illimité titres + images — idéal pour un jour de bouclage, une couverture breaking news, ou avant de soumettre un dossier à un client.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">Quelle taille d'image recommandez-vous ?<span class="faq-toggle">+</span></div><div class="faq-a">Google Discover recommande minimum 1200px de large avec un ratio 16:9. Évitez les images portrait, les logos seuls et les images avec du texte incrusté — notre analyseur détecte et pénalise ces cas automatiquement.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">Puis-je annuler à tout moment ?<span class="faq-toggle">+</span></div><div class="faq-a">Oui. Aucun engagement, annulation en un clic depuis votre tableau de bord Stripe. Votre accès reste actif jusqu'à la fin de la période déjà payée.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">Vous proposez des factures pour les entreprises ?<span class="faq-toggle">+</span></div><div class="faq-a">Oui. Chaque paiement génère automatiquement une facture TVA via Stripe. Pour les plans Équipe avec facturation personnalisée (bon de commande, etc.), contactez-nous directement.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="cta">
+  <h2 class="cta-title">Votre prochain article<br><em>mérite d'être vu</em></h2>
+  <p class="cta-sub">5 analyses gratuites. Pas de carte bancaire. Résultat en 5 secondes.</p>
+  <div class="cta-actions">
+    <a href="discoforge.html" class="btn-cta-light">Analyser gratuitement →</a>
+    <a href="#pricing" class="btn-cta-ghost">Voir les tarifs</a>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo">DiscoForge</div>
+  <div class="footer-links">
+    <a href="discoforge.html">Outil</a>
+    <a href="#pricing">Tarifs</a>
+    <a href="#faq">FAQ</a>
+    <a href="mailto:contact@discoforge.io">Contact</a>
+  </div>
+  <div class="footer-copy">© 2026 DiscoForge</div>
+</footer>
+
+<script>
+function toggleFaq(el) { el.parentElement.classList.toggle('open'); }
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+</script>
+</body>
+</html>
