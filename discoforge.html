@@ -565,16 +565,13 @@ Réponds UNIQUEMENT en JSON valide sans markdown :
 {"scores":{"entity_density":<f>,"topic_clarity":<f>,"informational_value":<f>,"freshness_signal":<f>,"engagement_depth":<f>,"title_formatting":<f>,"natural_authority":<f>,"visual_promise":<f>},"clickbait_score":<f>,"analysis":"<s>","improvements":["<s>","<s>"]}`;
 
 async function analyzeTitle(title) {
-  const r = await fetch("https://api.anthropic.com/v1/messages", {
+  const r = await fetch("/api/analyze", {
     method:"POST", headers:{"Content-Type":"application/json"},
-    body: JSON.stringify({
-      model:"claude-sonnet-4-20250514", max_tokens:1000, temperature:0,
-      messages:[{role:"user", content:`${TITLE_PROMPT}\n\nTITRE: "${title}"`}]
-    })
+    body: JSON.stringify({ titles: [title], prompt: TITLE_PROMPT })
   });
-  if (!r.ok) throw new Error(`API ${r.status}: ${await r.text()}`);
-  const msg = await r.json();
-  let txt = msg.content[0].text.trim();
+  const data = await r.json();
+  if (data.results[0].error) throw new Error(data.results[0].error);
+  let txt = data.results[0].raw.trim();
   if (txt.startsWith('```')) txt = txt.replace(/^```(?:json)?\s*/,'').replace(/\s*```$/,'');
   const p = JSON.parse(txt);
   const scores = {};
@@ -699,19 +696,13 @@ Réponds UNIQUEMENT en JSON valide sans markdown :
 {"scores":{"aspect_ratio":<f>,"technical_quality":<f>,"visual_appeal":<f>,"discover_relevance":<f>,"text_overlay":<f>,"safe_search":<f>,"news_coherence":<f>},"analysis":"<s>","improvements":["<s>","<s>","<s>"],"og_image_verdict":"<s>","detected_subject":"<s>","estimated_dimensions":"<s>"}`;
 
 async function analyzeImage(b64, mediaType) {
-  const r = await fetch("https://api.anthropic.com/v1/messages", {
+  const r = await fetch("/api/analyze-image", {
     method:"POST", headers:{"Content-Type":"application/json"},
-    body: JSON.stringify({
-      model:"claude-sonnet-4-20250514", max_tokens:1000, temperature:0,
-      messages:[{role:"user", content:[
-        { type:"image", source:{ type:"base64", media_type: mediaType, data: b64 } },
-        { type:"text", text: IMG_PROMPT }
-      ]}]
-    })
+    body: JSON.stringify({ image_b64: b64, media_type: mediaType, prompt: IMG_PROMPT })
   });
-  if (!r.ok) throw new Error(`API ${r.status}: ${await r.text()}`);
-  const msg = await r.json();
-  let txt = msg.content[0].text.trim();
+  const data = await r.json();
+  if (data.error) throw new Error(data.error);
+  let txt = data.raw.trim();
   if (txt.startsWith('```')) txt = txt.replace(/^```(?:json)?\s*/,'').replace(/\s*```$/,'');
   const p = JSON.parse(txt);
   const scores = {};
