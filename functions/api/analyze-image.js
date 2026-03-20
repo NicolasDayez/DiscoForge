@@ -40,4 +40,4 @@ export async function onRequestPost(context) {
 
 Commit message :
 ```
-add analyze-image proxy function
+fix: clean analyze-image.js
