@@ -210,6 +210,14 @@ footer { background:var(--ink); border-top:1px solid #1a1a18; padding:1.8rem 3re
   .roi-strip, .pass-spotlight { grid-template-columns:1fr; }
   .pass-period { text-align:left; } footer { flex-direction:column; align-items:flex-start; }
 }
+
+.billing-toggle { display:flex; align-items:center; gap:1rem; margin-bottom:2.5rem; }
+.billing-label { font-family:var(--mono); font-size:.72rem; letter-spacing:.1em; text-transform:uppercase; color:var(--ink3); transition:color .2s; }
+.toggle-btn { position:relative; width:48px; height:26px; background:var(--border2); border:none; border-radius:13px; cursor:pointer; transition:background .2s; padding:0; flex-shrink:0; }
+.toggle-btn.annual { background:var(--ink); }
+.toggle-knob { position:absolute; top:3px; left:3px; width:20px; height:20px; background:#fff; border-radius:50%; transition:transform .2s; display:block; }
+.toggle-btn.annual .toggle-knob { transform:translateX(22px); }
+.savings-badge { background:var(--accent2); color:#fff; font-size:.58rem; padding:.15rem .4rem; border-radius:2rem; letter-spacing:.08em; margin-left:.3rem; font-family:var(--mono); }
 </style>
 </head>
 <body>
@@ -354,7 +362,17 @@ footer { background:var(--ink); border-top:1px solid #1a1a18; padding:1.8rem 3re
       <h2 class="section-title">Simple.<br><em>Sans surprise.</em></h2>
       <p style="font-size:.93rem;color:var(--ink2);line-height:1.78;max-width:480px;">L'analyse image — notre fonctionnalité la plus puissante — est réservée au Plan Pro. C'est elle qui coûte le plus en API et qui génère le plus de valeur.</p>
     </div>
-    <div class="pricing-grid reveal">
+    
+    <!-- TOGGLE MENSUEL / ANNUEL -->
+    <div class="billing-toggle reveal">
+      <span class="billing-label" id="label-monthly" style="color:var(--ink)">Mensuel</span>
+      <button class="toggle-btn" id="billingToggle" onclick="toggleBilling()">
+        <span class="toggle-knob"></span>
+      </button>
+      <span class="billing-label" id="label-annual">Annuel <span class="savings-badge">2 mois offerts</span></span>
+    </div>
+
+<div class="pricing-grid reveal">
       <div class="plan-card">
         <div class="plan-name">Starter</div>
         <div class="plan-price"><sup>€</sup>0</div>
@@ -362,7 +380,7 @@ footer { background:var(--ink); border-top:1px solid #1a1a18; padding:1.8rem 3re
         <div class="plan-tagline">Pour tester et se convaincre.</div>
         <div class="plan-divider"></div>
         <ul class="plan-features">
-          <li>5 analyses titres / mois</li>
+          <li>50 analyses titres / mois</li>
           <li>Score pCTR complet (8 dim.)</li>
           <li>Pénalité clickbait β</li>
           <li>Recommandations IA</li>
@@ -370,17 +388,21 @@ footer { background:var(--ink); border-top:1px solid #1a1a18; padding:1.8rem 3re
           <li class="no">Historique des analyses</li>
           <li class="no">Export CSV</li>
         </ul>
-        <a href="discoforge.html" class="plan-btn btn-outline">Commencer gratuit</a>
+        <a href="https://buy.stripe.com/3cI5kC5co6IT7ZeaO79Ve02" class="plan-btn btn-outline">Commencer →</a>
       </div>
       <div class="plan-card featured">
         <div class="plan-badge">Recommandé</div>
         <div class="plan-name">Pro</div>
-        <div class="plan-price"><sup>€</sup>29</div>
-        <div class="plan-period">par mois · sans engagement</div>
-        <div class="plan-tagline">Freelances SEO, éditeurs de niche.</div>
+        <div class="plan-price">
+          <span class="price-m"><sup>€</sup>149</span>
+          <span class="price-a" style="display:none"><sup>€</sup>1490</span>
+        </div>
+        <div class="plan-period price-m">par mois · sans engagement</div>
+        <div class="plan-period price-a" style="display:none">par an · <s style="opacity:.4">1788€</s> → économisez 298€</div>
+        <div class="plan-tagline">Agences de contenu, rédacteurs SEO.</div>
         <div class="plan-divider"></div>
         <ul class="plan-features">
-          <li>200 analyses titres / mois</li>
+          <li>500 analyses titres / mois</li>
           <li>Score pCTR complet (8 dim.)</li>
           <li>Pénalité clickbait β</li>
           <li>Recommandations IA</li>
@@ -388,24 +410,28 @@ footer { background:var(--ink); border-top:1px solid #1a1a18; padding:1.8rem 3re
           <li>Historique 90 jours</li>
           <li>Export CSV</li>
         </ul>
-        <a href="#" class="plan-btn btn-solid" onclick="alert('Paiement bientôt disponible via Stripe !')">Passer Pro</a>
+        <a href="https://buy.stripe.com/3cI8wO9sEd7ha7m8FZ9Ve01" class="plan-btn btn-solid">Passer Pro →</a>
       </div>
       <div class="plan-card">
-        <div class="plan-name">Équipe</div>
-        <div class="plan-price"><sup>€</sup>99</div>
-        <div class="plan-period">par mois · 5 sièges</div>
-        <div class="plan-tagline">Rédactions et agences presse.</div>
+        <div class="plan-name">Enterprise</div>
+        <div class="plan-price">
+          <span class="price-m"><sup>€</sup>499</span>
+          <span class="price-a" style="display:none"><sup>€</sup>4990</span>
+        </div>
+        <div class="plan-period price-m">par mois · sur devis au-delà</div>
+        <div class="plan-period price-a" style="display:none">par an · <s style="opacity:.4">5988€</s> → économisez 998€</div>
+        <div class="plan-tagline">Médias d'actualité, groupes de presse.</div>
         <div class="plan-divider"></div>
         <ul class="plan-features">
           <li>Tout le plan Pro</li>
-          <li>5 comptes rédacteurs</li>
+          <li>10 comptes rédacteurs</li>
           <li>Analyses illimitées</li>
           <li class="star">Analyse image Discover ★</li>
           <li>Historique 12 mois</li>
           <li>Export CSV + PDF rapport</li>
-          <li>Support prioritaire</li>
+          <li>Onboarding + support dédié</li>
         </ul>
-        <a href="mailto:contact@discoforge.io" class="plan-btn btn-outline">Nous contacter</a>
+        <a href="mailto:dayez.nicolas@gmail.com?subject=Demande%20d%C3%A9mo%20DiscoForge%20Enterprise&body=Bonjour%2C%0A%0AJe%20souhaite%20en%20savoir%20plus%20sur%20le%20plan%20Enterprise%20de%20DiscoForge.%0A%0AMon%20organisation%20%3A%0ANombre%20de%20r%C3%A9dacteurs%20%3A%0A%0ACordialement" class="plan-btn btn-outline">Demander une démo →</a>
       </div>
     </div>
 
@@ -432,7 +458,7 @@ footer { background:var(--ink); border-top:1px solid #1a1a18; padding:1.8rem 3re
         <div><div class="roi-cell-num red">+500</div><div class="roi-cell-label">Clics supplémentaires</div></div>
         <div><div class="roi-cell-num green">25 €</div><div class="roi-cell-label">Valeur traffic (0,05€/clic)</div></div>
       </div>
-      <div class="roi-conclusion">DiscoForge Pro à 29€/mois est rentabilisé si vous gagnez <strong>+1% de CTR sur un seul article à 50 000 impressions</strong>. Pour une rédaction publiant 20 articles/semaine, le retour est immédiat dès le premier jour d'utilisation.</div>
+      <div class="roi-conclusion">Un mauvais titre sur Discover peut faire perdre 10 000 clics en une semaine. <strong>DiscoForge Starter à 49€/mois est rentabilisé dès le premier article optimisé.</strong> Pour une rédaction publiant 20 articles/semaine, le ROI est immédiat.</div>
     </div>
     <p class="pricing-note reveal">✓ Paiement sécurisé Stripe · Annulation en 1 clic · Facture TVA automatique</p>
   </div>
@@ -472,13 +498,23 @@ footer { background:var(--ink); border-top:1px solid #1a1a18; padding:1.8rem 3re
     <a href="discoforge.html">Outil</a>
     <a href="#pricing">Tarifs</a>
     <a href="#faq">FAQ</a>
-    <a href="mailto:contact@discoforge.io">Contact</a>
+    <a href="mailto:dayez.nicolas@gmail.com">Contact</a>
   </div>
   <div class="footer-copy">© 2026 DiscoForge</div>
 </footer>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 function toggleFaq(el) { el.parentElement.classList.toggle('open'); }
+
+function toggleBilling() {
+  const btn = document.getElementById('billingToggle');
+  const isAnnual = btn.classList.toggle('annual');
+  document.querySelectorAll('.price-m').forEach(el => el.style.display = isAnnual ? 'none' : '');
+  document.querySelectorAll('.price-a').forEach(el => el.style.display = isAnnual ? '' : 'none');
+  document.getElementById('label-monthly').style.color = isAnnual ? 'var(--ink4)' : 'var(--ink)';
+  document.getElementById('label-annual').style.color = isAnnual ? 'var(--ink)' : 'var(--ink4)';
+}
+
 const obs = new IntersectionObserver(entries => {
   entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
 }, { threshold: 0.1 });
