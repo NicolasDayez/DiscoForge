@@ -36,8 +36,3 @@ export async function onRequestPost(context) {
   const msg = await resp.json();
   return Response.json({ raw: msg.content[0].text });
 }
-```
-
-Commit message :
-```
-fix: clean analyze-image.js
