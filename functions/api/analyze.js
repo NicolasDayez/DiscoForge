@@ -31,8 +31,3 @@ export async function onRequestPost(context) {
   }
   return Response.json({ results });
 }
-```
-
-Commit message :
-```
-add analyze proxy function
