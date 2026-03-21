@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>À propos — Nicolas Dayez · DiscoForge</title>
+<meta name="description" content="Nicolas Dayez, consultant SEO spécialisé Google Discover. Créateur de DiscoForge, l'outil de scoring pCTR pour optimiser vos contenus dans le feed Discover.">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Instrument+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5f2eb;--ink:#0e0d0b;--ink2:#3a3832;--ink3:#8a8780;--ink4:#c4c1b8;--accent:#d4380d;--accent2:#1a6b3a;--surface:#eeeae0;--surface2:#e6e2d6;--border:#d4d0c4;--border2:#c0bbb0;--gold:#b8860b;--serif:'Playfair Display',serif;--sans:'Instrument Sans',sans-serif;--mono:'JetBrains Mono',monospace;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-weight:300;overflow-x:hidden;}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");opacity:.6;}
+nav{position:sticky;top:0;z-index:100;padding:1.1rem 3rem;display:flex;align-items:center;justify-content:space-between;background:rgba(245,242,235,.95);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);}
+.nav-logo{font-family:var(--serif);font-size:1.4rem;font-weight:700;color:var(--ink);text-decoration:none;letter-spacing:-.02em;display:flex;align-items:center;gap:.5rem;}
+.nav-dot{width:7px;height:7px;background:var(--accent);border-radius:50%;animation:bdot 2.5s ease-in-out infinite;}
+@keyframes bdot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.3)}}
+.nav-links{display:flex;align-items:center;gap:1.5rem;}
+.nav-links a{font-size:.78rem;color:var(--ink2);text-decoration:none;transition:color .15s;}
+.nav-links a:hover{color:var(--accent);}
+.nav-cta{background:var(--ink);color:var(--bg);padding:.5rem 1.2rem;border-radius:2px;font-size:.75rem;font-weight:500;letter-spacing:.06em;text-decoration:none;transition:background .18s;font-family:var(--mono);}
+.nav-cta:hover{background:var(--accent);color:#fff;}
+
+/* HERO ABOUT */
+.about-hero{padding:5rem 3rem 4rem;max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 340px;gap:5rem;align-items:start;}
+.hero-kicker{font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem;display:flex;align-items:center;gap:.7rem;}
+.hero-kicker::before{content:'';width:1.8rem;height:1px;background:var(--accent);}
+.about-h1{font-family:var(--serif);font-size:clamp(2.5rem,6vw,4.5rem);line-height:1.03;letter-spacing:-.04em;font-weight:700;margin-bottom:1.5rem;}
+.about-h1 em{font-style:italic;color:var(--accent);}
+.about-intro{font-size:1rem;color:var(--ink2);line-height:1.85;margin-bottom:2rem;}
+.about-tags{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:2rem;}
+.tag{font-family:var(--mono);font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;background:var(--surface);border:1px solid var(--border);color:var(--ink3);padding:.22rem .65rem;border-radius:2rem;}
+.tag.red{color:var(--accent);border-color:rgba(212,56,13,.25);background:rgba(212,56,13,.05);}
+.tag.green{color:var(--accent2);border-color:rgba(26,107,58,.25);background:rgba(26,107,58,.05);}
+
+/* PROFILE CARD */
+.profile-card{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:2rem;position:sticky;top:90px;}
+.profile-avatar{width:100px;height:100px;border-radius:50%;overflow:hidden;margin-bottom:1.2rem;border:2px solid var(--border);}
+.profile-avatar img{width:100%;height:100%;object-fit:cover;object-position:center top;}
+.profile-name{font-family:var(--serif);font-size:1.2rem;font-weight:700;margin-bottom:.2rem;}
+.profile-title{font-size:.82rem;color:var(--ink3);margin-bottom:1.2rem;}
+.profile-divider{height:1px;background:var(--border);margin-bottom:1.2rem;}
+.profile-stats{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin-bottom:1.2rem;}
+.ps-num{font-family:var(--serif);font-size:1.5rem;font-weight:700;letter-spacing:-.02em;line-height:1;}
+.ps-label{font-family:var(--mono);font-size:.55rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin-top:.15rem;}
+.profile-cta{display:block;background:var(--ink);color:var(--bg);text-align:center;padding:.75rem;font-family:var(--mono);font-size:.68rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;border-radius:2px;transition:background .18s;}
+.profile-cta:hover{background:var(--accent);}
+
+/* CONTENT */
+.about-content{max-width:1100px;margin:0 auto;padding:0 3rem 5rem;}
+.about-section{margin-bottom:4rem;padding-bottom:4rem;border-bottom:1px solid var(--border);}
+.about-section:last-child{border-bottom:none;}
+.section-kicker{font-family:var(--mono);font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--ink3);margin-bottom:.8rem;display:flex;align-items:center;gap:.6rem;}
+.section-kicker::before{content:'';width:1.5rem;height:1px;background:var(--ink4);}
+.section-title{font-family:var(--serif);font-size:1.8rem;font-weight:700;letter-spacing:-.02em;margin-bottom:1.2rem;}
+.section-title em{font-style:italic;color:var(--accent);}
+.section-body{font-size:.9rem;color:var(--ink2);line-height:1.85;}
+.section-body p{margin-bottom:1rem;}
+.section-body strong{color:var(--ink);font-weight:500;}
+
+/* MANIFESTO */
+.manifesto{background:var(--ink);color:var(--bg);padding:3rem;border-radius:3px;margin:2rem 0;}
+.manifesto-text{font-family:var(--serif);font-size:1.4rem;font-style:italic;line-height:1.5;letter-spacing:-.01em;}
+.manifesto-text em{color:var(--accent);}
+.manifesto-attr{font-family:var(--mono);font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(245,242,235,.3);margin-top:1rem;}
+
+/* TIMELINE */
+.timeline{display:flex;flex-direction:column;gap:0;}
+.tl-item{display:grid;grid-template-columns:80px 1fr;gap:1.5rem;padding:1.2rem 0;border-bottom:1px solid var(--border);}
+.tl-item:last-child{border-bottom:none;}
+.tl-year{font-family:var(--mono);font-size:.75rem;color:var(--ink3);padding-top:.15rem;}
+.tl-content{}
+.tl-title{font-size:.88rem;font-weight:500;margin-bottom:.2rem;}
+.tl-desc{font-size:.8rem;color:var(--ink3);line-height:1.65;}
+
+footer{background:var(--ink);border-top:1px solid #1a1a18;padding:2rem 3rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;}
+.footer-logo{font-family:var(--serif);font-size:1.1rem;color:rgba(245,242,235,.3);}
+.footer-links{display:flex;gap:1.5rem;flex-wrap:wrap;}
+.footer-links a{font-family:var(--mono);font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(245,242,235,.2);text-decoration:none;transition:color .15s;}
+.footer-links a:hover{color:rgba(245,242,235,.55);}
+.footer-copy{font-family:var(--mono);font-size:.56rem;color:rgba(245,242,235,.15);text-transform:uppercase;}
+@media(max-width:900px){.about-hero{grid-template-columns:1fr;gap:2rem;padding:3rem 1.4rem;}.profile-card{position:static;}.about-content{padding-left:1.4rem;padding-right:1.4rem;}nav{padding:1rem 1.4rem;}.nav-links{display:none;}}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">DiscoForge <span class="nav-dot"></span></a>
+  <div class="nav-links">
+    <a href="discoforge.html">Analyser</a>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="blog.html">Blog</a>
+    <a href="contact.html">Contact</a>
+  </div>
+  <a href="discoforge.html" class="nav-cta">Essai gratuit →</a>
+</nav>
+
+<div class="about-hero">
+  <div>
+    <div class="hero-kicker">À propos</div>
+    <h1 class="about-h1">Nicolas<br><em>Dayez</em></h1>
+    <p class="about-intro">Consultant SEO spécialisé dans les algorithmes de distribution de contenu — en particulier Google Discover, le canal qui distribue l'information sans que l'utilisateur ne cherche rien.</p>
+    <div class="about-tags">
+      <span class="tag red">Google Discover</span>
+      <span class="tag green">SEO éditorial</span>
+      <span class="tag">Knowledge Graph</span>
+      <span class="tag">E-E-A-T</span>
+      <span class="tag">Créateur de DiscoForge</span>
+    </div>
+  </div>
+  <div class="profile-card">
+    <div class="profile-avatar"><img src="data:image/avif;base64,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" alt="Nicolas Dayez — Consultant SEO Google Discover" loading="lazy"></div>
+    <div class="profile-name">Nicolas Dayez</div>
+    <div class="profile-title">Consultant SEO & Google Discover</div>
+    <div class="profile-divider"></div>
+    <div class="profile-stats">
+      <div><div class="ps-num">8+</div><div class="ps-label">Ans SEO</div></div>
+      <div><div class="ps-num">50+</div><div class="ps-label">Médias conseillés</div></div>
+      <div><div class="ps-num">2026</div><div class="ps-label">DiscoForge</div></div>
+      <div><div class="ps-num">FR</div><div class="ps-label">Basé en France</div></div>
+    </div>
+    <a href="contact.html" class="profile-cta">Me contacter →</a>
+  </div>
+</div>
+
+<div class="about-content">
+
+  <div class="about-section">
+    <div class="section-kicker">Manifeste</div>
+    <div class="manifesto">
+      <div class="manifesto-text">"Google Discover est le canal de distribution le plus puissant et le moins compris de l'écosystème éditorial. J'ai créé DiscoForge pour changer ça — un article à la fois."</div>
+      <div class="manifesto-attr">— Nicolas Dayez, fondateur de DiscoForge</div>
+    </div>
+  </div>
+
+  <div class="about-section">
+    <div class="section-kicker">Parcours</div>
+    <h2 class="section-title">De la <em>presse</em> aux algorithmes</h2>
+    <div class="section-body">
+      <p>Pendant plus de 8 ans, j'ai accompagné des rédactions, des médias numériques et des agences de contenu dans leur stratégie de visibilité organique. Ce travail m'a amené à observer un paradoxe récurrent : les éditeurs investissent dans la qualité éditoriale mais publient à l'aveugle sur Discover.</p>
+      <p>Google Discover distribue des dizaines de millions d'articles chaque jour sans que les éditeurs comprennent vraiment les signaux qui déclenchent ou bloquent la distribution. J'ai consacré plusieurs années à documenter ces signaux, tester des hypothèses, analyser des milliers de performances.</p>
+      <p>DiscoForge est le résultat de cette recherche : <strong>un moteur de scoring pCTR calibré sur les 9 étapes du pipeline Discover</strong>, accessible en quelques secondes.</p>
+    </div>
+    <div class="timeline">
+      <div class="tl-item"><div class="tl-year">2016</div><div class="tl-content"><div class="tl-title">Premiers pas en SEO éditorial</div><div class="tl-desc">Accompagnement de rédactions régionales dans leur transition numérique</div></div></div>
+      <div class="tl-item"><div class="tl-year">2019</div><div class="tl-content"><div class="tl-title">Découverte de Google Discover</div><div class="tl-desc">Premiers tests et analyses des signaux de distribution dans le feed</div></div></div>
+      <div class="tl-item"><div class="tl-year">2022</div><div class="tl-content"><div class="tl-title">Spécialisation Knowledge Graph & E-E-A-T</div><div class="tl-desc">Étude des entités, des graphes de connaissances et des signaux d'autorité</div></div></div>
+      <div class="tl-item"><div class="tl-year">2025</div><div class="tl-content"><div class="tl-title">Développement du modèle pCTR</div><div class="tl-desc">Création du scoring sur 8 dimensions avec pénalité β clickbait</div></div></div>
+      <div class="tl-item"><div class="tl-year">2026</div><div class="tl-content"><div class="tl-title">Lancement de DiscoForge</div><div class="tl-desc">Premier outil de scoring pCTR + analyse image og pour Google Discover</div></div></div>
+    </div>
+  </div>
+
+  <div class="about-section">
+    <div class="section-kicker">Expertise</div>
+    <h2 class="section-title">Ce que je fais <em>concrètement</em></h2>
+    <div class="section-body">
+      <p>Mon travail se situe à l'intersection du SEO éditorial, de l'analyse algorithmique et de la stratégie de contenu. Je travaille avec des rédactions qui veulent comprendre — et maîtriser — leur distribution sur Google Discover.</p>
+      <p><strong>Audit Discover</strong> — analyse complète des performances, identification des signaux manquants, recommandations priorisées par impact estimé.</p>
+      <p><strong>Formation équipes éditoriales</strong> — sensibiliser les journalistes et rédacteurs aux critères qui déclenchent la distribution dans Discover, sans jargon technique.</p>
+      <p><strong>Stratégie de contenu algorithmique</strong> — construire une ligne éditoriale qui répond aux critères E-E-A-T et aux signaux d'entités Knowledge Graph valorisés par Google.</p>
+      <p><strong>DiscoForge</strong> — l'outil SaaS que j'ai développé pour automatiser le scoring pCTR et rendre l'optimisation Discover accessible à tous les éditeurs.</p>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <div class="footer-logo">DiscoForge</div>
+  <div class="footer-links">
+    <a href="mentions-legales.html">Mentions légales</a>
+    <a href="confidentialite.html">Confidentialité</a>
+    <a href="cgu.html">CGU</a>
+    <a href="cgv.html">CGV</a>
+    <a href="cookies.html">Cookies</a>
+    <a href="contact.html">Contact</a>
+    <a href="blog.html">Blog</a>
+  </div>
+  <div class="footer-copy">© 2026 DiscoForge · Nicolas Dayez</div>
+</footer>
+
+</body>
+</html>
