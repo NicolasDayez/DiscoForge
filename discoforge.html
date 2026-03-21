@@ -401,7 +401,7 @@
 <div class="access-gate" id="accessGate">
   <div class="gate-bar" id="gateBar">
     <span class="gate-icon" id="gateIcon">🔒</span>
-    <input class="gate-input" id="gateInput" type="text" placeholder="Code d'accès (ex: DISCO-PRO) · 5 analyses gratuites sans code" maxlength="20" oninput="checkCode(this.value)">
+    <input class="gate-input" id="gateInput" type="text" placeholder="Entrez votre code d'accès Pro · 5 analyses gratuites sans code" maxlength="20" oninput="checkCode(this.value)">
     <span class="gate-status" id="gateStatus"></span>
   </div>
   <div class="gate-free-note">
@@ -726,114 +726,125 @@ function showResults(html, countStr) {
 }
 
 /* ═══════════════════════════════════════
-   ACCESS GATE
+   ACCESS GATE — vérification côté serveur
+   Les codes ne sont JAMAIS dans ce fichier.
 ═══════════════════════════════════════ */
-const VALID_CODES = ['DISCO-PRO', 'DISCO-ENTERPRISE', 'DISCO-STARTER'];
-const IMAGE_CODES = ['DISCO-PRO', 'DISCO-ENTERPRISE']; // Image analysis: Pro + Enterprise only
-let currentCode = '';
 const FREE_LIMIT = 5;
 let isUnlocked = false;
+let currentPlan = null;
+let currentFeatures = {};
 let freeUsed = parseInt(localStorage.getItem('df_free_used') || '0');
+let verifyTimeout = null;
 
-function checkCode(val) {
-  const code = val.trim().toUpperCase();
-  const bar = document.getElementById('gateBar');
-  const icon = document.getElementById('gateIcon');
+async function checkCode(val) {
+  const code = val.trim();
+  if (code.length < 4) { document.getElementById('gateStatus').textContent = ''; return; }
   const status = document.getElementById('gateStatus');
-
-  if (VALID_CODES.includes(code)) {
-    isUnlocked = true;
-    currentCode = code;
-    bar.classList.add('unlocked');
-    icon.textContent = '✓';
-    const isImagePlan = IMAGE_CODES.includes(code);
-    status.textContent = isImagePlan ? '✓ Pro — titres + images' : '✓ Starter — titres uniquement';
-    status.className = 'gate-status ok';
-    localStorage.setItem('df_code', code);
-    enableAllFeatures(isImagePlan);
-  } else if (code.length > 3) {
-    status.textContent = '✗ Code invalide';
-    status.className = 'gate-status err';
-  } else {
-    status.textContent = '';
-  }
+  status.textContent = '…'; status.className = 'gate-status neutral';
+  clearTimeout(verifyTimeout);
+  verifyTimeout = setTimeout(async () => {
+    try {
+      const resp = await fetch('/api/verify-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code })
+      });
+      const data = await resp.json();
+      if (data.valid) {
+        isUnlocked = true; currentPlan = data.plan; currentFeatures = data.features;
+        const bar = document.getElementById('gateBar');
+        const icon = document.getElementById('gateIcon');
+        bar.classList.add('unlocked'); icon.textContent = '✓';
+        const planLabel = { pro: 'Pro', enterprise: 'Enterprise', starter: 'Starter', beta: 'Bêta' }[data.plan] || data.plan;
+        status.textContent = '✓ ' + planLabel + ' activé'; status.className = 'gate-status ok';
+        localStorage.setItem('df_token', btoa(code + ':' + Date.now()));
+        localStorage.setItem('df_plan', data.plan);
+        localStorage.setItem('df_features', JSON.stringify(data.features));
+        applyFeatures(data.features, data.plan);
+      } else {
+        status.textContent = '✗ Code invalide'; status.className = 'gate-status err';
+        isUnlocked = false; currentFeatures = {}; updateImageGate(false);
+      }
+    } catch(e) { status.textContent = '⚠ Erreur réseau'; status.className = 'gate-status err'; }
+  }, 600);
 }
 
-function checkFreeLimit() {
-  if (isUnlocked) return true;
-  if (freeUsed >= FREE_LIMIT) {
-    alert(`Vous avez utilisé vos ${FREE_LIMIT} analyses gratuites.
-Entrez votre code Pro ou abonnez-vous sur discoforge.com`);
-    return false;
-  }
-  freeUsed++;
-  localStorage.setItem('df_free_used', freeUsed);
-  updateFreeCounter();
-  return true;
-}
-
-function updateFreeCounter() {
-  const note = document.querySelector('.gate-free-note');
-  if (!isUnlocked && note) {
-    const remaining = Math.max(0, FREE_LIMIT - freeUsed);
-    note.innerHTML = `${remaining} analyse${remaining > 1 ? 's' : ''} gratuite${remaining > 1 ? 's' : ''} restante${remaining > 1 ? 's' : ''} · <a href="index.html#pricing">Passer Pro</a>`;
-  }
-}
-
-function enableAllFeatures(hasImageAccess) {
+function applyFeatures(features, plan) {
   const note = document.querySelector('.gate-free-note');
   if (note) {
-    note.innerHTML = hasImageAccess
-      ? '<span style="color:var(--green)">✓ Pro — titres illimités + analyse image</span>'
-      : '<span style="color:var(--accent)">✓ Starter — titres illimités · <a href="index.html#pricing">Passer Pro pour les images</a></span>';
+    const labels = {
+      beta: '<span style="color:var(--purple)">★ Bêta — accès complet illimité</span>',
+      enterprise: '<span style="color:var(--green)">✓ Enterprise — tout illimité</span>',
+      pro: '<span style="color:var(--green)">✓ Pro — titres illimités + images</span>',
+      starter: '<span style="color:var(--accent)">✓ Starter — titres illimités · <a href=\"index.html#pricing\">Passer Pro pour les images</a></span>',
+    };
+    note.innerHTML = labels[plan] || '';
   }
-  updateImageGate(hasImageAccess);
+  updateImageGate(features.images === true);
+  // Affiche le lien Dashboard si l'utilisateur a accès
+  const dashLink = document.getElementById('dashboardNavLink');
+  if (dashLink && features.dashboard) dashLink.style.display = 'inline-flex';
 }
 
 function updateImageGate(hasAccess) {
   const gate = document.getElementById('imgProGate');
   const section = document.getElementById('imgSection');
-  const imgFooter = section ? section.querySelector('.input-footer') : null;
   if (!gate || !section) return;
-  if (hasAccess) {
-    gate.style.display = 'none';
-    section.style.display = 'block';
-  } else {
-    gate.style.display = 'block';
-    section.style.display = 'none';
+  gate.style.display = hasAccess ? 'none' : 'block';
+  section.style.display = hasAccess ? 'block' : 'none';
+}
+
+function checkFreeLimit() {
+  if (isUnlocked) return true;
+  if (freeUsed >= FREE_LIMIT) {
+    alert('Vous avez utilisé vos ' + FREE_LIMIT + ' analyses gratuites.\nEntrez votre code ou abonnez-vous sur discoforge.com');
+    return false;
+  }
+  freeUsed++; localStorage.setItem('df_free_used', freeUsed); updateFreeCounter(); return true;
+}
+
+function updateFreeCounter() {
+  const note = document.querySelector('.gate-free-note');
+  if (!isUnlocked && note) {
+    const r = Math.max(0, FREE_LIMIT - freeUsed);
+    note.innerHTML = r + ' analyse' + (r !== 1 ? 's' : '') + ' gratuite' + (r !== 1 ? 's' : '') + ' restante' + (r !== 1 ? 's' : '') + ' · <a href="index.html#pricing">Passer Pro</a>';
   }
 }
 
-// Restore saved code on page load
 window.addEventListener('load', () => {
-  const saved = localStorage.getItem('df_code');
-  if (saved && VALID_CODES.includes(saved)) {
-    document.getElementById('gateInput').value = saved;
-    checkCode(saved);
-  } else {
-    updateFreeCounter();
-    updateImageGate(false); // hide image section by default
+  const savedPlan = localStorage.getItem('df_plan');
+  const savedFeatures = localStorage.getItem('df_features');
+  const savedToken = localStorage.getItem('df_token');
+  if (savedPlan && savedFeatures && savedToken) {
+    try {
+      const ts = parseInt(atob(savedToken).split(':')[1]);
+      if (Date.now() - ts < 30 * 24 * 60 * 60 * 1000) {
+        isUnlocked = true; currentPlan = savedPlan; currentFeatures = JSON.parse(savedFeatures);
+        const bar = document.getElementById('gateBar');
+        const icon = document.getElementById('gateIcon');
+        const status = document.getElementById('gateStatus');
+        if (bar) bar.classList.add('unlocked');
+        if (icon) icon.textContent = '✓';
+        if (status) { const pl = { pro:'Pro', enterprise:'Enterprise', starter:'Starter', beta:'Bêta' }[savedPlan] || savedPlan; status.textContent = '✓ ' + pl + ' activé'; status.className = 'gate-status ok'; }
+        applyFeatures(currentFeatures, savedPlan);
+        const dashLink = document.getElementById('dashboardNavLink');
+        if (dashLink && currentFeatures.dashboard) dashLink.style.display = 'inline-flex';
+        return;
+      }
+    } catch(e) {}
+    localStorage.removeItem('df_token'); localStorage.removeItem('df_plan'); localStorage.removeItem('df_features');
   }
+  updateFreeCounter(); updateImageGate(false);
 });
 
-// Wrap runTitleAnalysis and runImageAnalysis with gate check
 const _origTitle = runTitleAnalysis;
-runTitleAnalysis = async function() {
-  if (!checkFreeLimit()) return;
-  return _origTitle.apply(this, arguments);
-};
+runTitleAnalysis = async function() { if (!checkFreeLimit()) return; return _origTitle.apply(this, arguments); };
 
 const _origImage = runImageAnalysis;
 runImageAnalysis = async function() {
-  if (!IMAGE_CODES.includes(currentCode)) {
-    alert('L'analyse d'image est réservée aux plans Pro et Enterprise.\nEntrez votre code Pro ou abonnez-vous sur discoforge.com');
-    return;
-  }
+  if (!currentFeatures.images) { alert("L'analyse d'image est réservée aux plans Pro et Enterprise.\nAbonnez-vous sur discoforge.com"); return; }
   return _origImage.apply(this, arguments);
 };
-
-
-
 </script>
 </body>
 </html>
