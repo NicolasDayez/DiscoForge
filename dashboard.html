@@ -327,11 +327,12 @@ tr:hover td { background: var(--surface2); }
 <script>
 
 /* ACCESS GATE */
-const VALID_CODES = ['DISCO-PRO', 'DISCO-ENTERPRISE'];
+const VALID_CODES_CLIENT = ['pro', 'enterprise', 'beta']; // plans with dashboard access
 
 function checkDashboardAccess() {
   const saved = localStorage.getItem('df_code');
-  if (saved && VALID_CODES.includes(saved)) return true;
+  const savedPlan = localStorage.getItem('df_plan');
+  if (savedPlan && VALID_CODES_CLIENT.includes(savedPlan)) return true;
 
   // Show gate overlay
   document.body.innerHTML = `
@@ -360,18 +361,29 @@ function checkDashboardAccess() {
   return false;
 }
 
-function tryUnlock(val) {
-  const code = val.trim().toUpperCase();
+async function tryUnlock(val) {
+  const code = val.trim();
+  if (code.length < 4) return;
   const msg = document.getElementById('gateMsg');
-  if (VALID_CODES.includes(code)) {
-    localStorage.setItem('df_code', code);
-    msg.style.color = '#4ade80';
-    msg.textContent = '✓ Accès validé — chargement…';
-    setTimeout(() => location.reload(), 800);
-  } else if (code.length > 3) {
-    msg.style.color = '#ff4d6d';
-    msg.textContent = '✗ Code invalide';
-  }
+  msg.style.color = 'var(--text-muted)'; msg.textContent = 'Vérification…';
+  try {
+    const resp = await fetch('/api/verify-code', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code })
+    });
+    const data = await resp.json();
+    if (data.valid && ['pro','enterprise','beta'].includes(data.plan)) {
+      localStorage.setItem('df_token', btoa(code + ':' + Date.now()));
+      localStorage.setItem('df_plan', data.plan);
+      localStorage.setItem('df_features', JSON.stringify(data.features));
+      msg.style.color = '#4ade80'; msg.textContent = '✓ Accès validé — chargement…';
+      setTimeout(() => location.reload(), 800);
+    } else if (data.valid) {
+      msg.style.color = '#ff6b35'; msg.textContent = '✗ Plan insuffisant — Pro ou Enterprise requis';
+    } else {
+      msg.style.color = '#ff4d6d'; msg.textContent = '✗ Code invalide';
+    }
+  } catch(e) { msg.style.color = '#ff4d6d'; msg.textContent = '⚠ Erreur réseau'; }
 }
 
 if (!checkDashboardAccess()) { /* blocked */ }
