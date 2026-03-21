@@ -314,6 +314,57 @@
     font-family:var(--mono); font-size:.76rem; color:var(--red); margin-bottom:1.4rem;
   }
 
+
+  /* ── Access Gate ── */
+  .access-gate {
+    max-width: 900px; margin: 0 auto; padding: 2rem 3rem 0;
+  }
+  .gate-bar {
+    display: flex; align-items: center; gap: 1rem;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 4px; padding: .8rem 1.2rem;
+    margin-bottom: 1.5rem;
+  }
+  .gate-bar.unlocked { border-color: rgba(74,222,128,.3); background: rgba(74,222,128,.04); }
+  .gate-icon { font-size: .9rem; flex-shrink: 0; }
+  .gate-input {
+    flex: 1; background: none; border: none; outline: none;
+    font-family: var(--mono); font-size: .82rem; color: var(--text);
+    letter-spacing: .12em; text-transform: uppercase; caret-color: var(--accent);
+  }
+  .gate-input::placeholder { color: var(--text-dim); text-transform: none; letter-spacing: 0; }
+  .gate-btn {
+    background: var(--accent); color: #0a0a0b; border: none;
+    font-family: var(--mono); font-size: .65rem; font-weight: 500;
+    letter-spacing: .1em; text-transform: uppercase;
+    padding: .4rem 1rem; border-radius: 3px; cursor: pointer; transition: all .18s;
+    flex-shrink: 0;
+  }
+  .gate-btn:hover { background: #f5ff7a; }
+  .gate-status { font-family: var(--mono); font-size: .65rem; letter-spacing: .08em; flex-shrink: 0; }
+  .gate-status.ok { color: #4ade80; }
+  .gate-status.err { color: var(--red); }
+  .gate-free-note {
+    font-family: var(--mono); font-size: .62rem; color: var(--text-dim);
+    letter-spacing: .06em; text-align: center; margin-bottom: 1rem;
+  }
+  .gate-free-note a { color: var(--text-muted); text-decoration: underline; }
+  .pro-badge {
+    display: inline-flex; align-items: center; gap: .3rem;
+    font-family: var(--mono); font-size: .58rem; letter-spacing: .1em; text-transform: uppercase;
+    background: rgba(232,255,71,.08); color: var(--accent); border: 1px solid rgba(232,255,71,.2);
+    padding: .18rem .5rem; border-radius: 2rem;
+  }
+  .locked-overlay {
+    position: relative; pointer-events: none; opacity: .35; filter: blur(1px);
+    user-select: none;
+  }
+  .locked-label {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    z-index: 10; font-family: var(--mono); font-size: .72rem; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--text-muted);
+  }
+
   /* ── Footer ── */
   footer {
     border-top:1px solid var(--border); padding:1.3rem 3rem;
@@ -342,13 +393,26 @@
     <span class="logo-title">DiscoForge</span>
     <span class="logo-dot"></span>
   </div>
-  <div class="header-badge">Google Discover · Analyse IA</div>
+  <div class="header-badge">Google Discover · pCTR Analyzer</div>
 </header>
+
+
+<!-- ACCESS GATE -->
+<div class="access-gate" id="accessGate">
+  <div class="gate-bar" id="gateBar">
+    <span class="gate-icon" id="gateIcon">🔒</span>
+    <input class="gate-input" id="gateInput" type="text" placeholder="Code d'accès (ex: DISCO-PRO) · 5 analyses gratuites sans code" maxlength="20" oninput="checkCode(this.value)">
+    <span class="gate-status" id="gateStatus"></span>
+  </div>
+  <div class="gate-free-note">
+    Pas encore Pro ? <a href="index.html#pricing">Voir les offres</a> · 5 analyses gratuites/mois sans code
+  </div>
+</div>
 
 <section class="hero">
   <div class="eyebrow">Optimisation Discover</div>
   <h1>Forge tes contenus<br>pour <em>Discover</em></h1>
-  <p class="hero-sub">Analyse tes titres <em>et</em> tes images pour Google Discover — pCTR prédit sur 8 dimensions, pénalité clickbait (β), scoring visuel Discover calibré.</p>
+  <p class="hero-sub">Analyse tes titres pour Google Discover — pCTR prédit sur 8 dimensions, pénalité clickbait (β), calibré sur le pipeline Discover en 9 étapes.</p>
 </section>
 
 <div class="formula-strip">
@@ -356,24 +420,10 @@
     <div class="formula-item"><span>Qualité titre</span>Σ(wᵢ × fᵢ) — 8 dimensions</div>
     <div class="formula-item"><span>Pénalité β</span>1 − 0.35 × (clickbait / 10)</div>
     <div class="formula-item"><span>pCTR</span>0.5% + 21.5% × σ(0.65 × (raw − 5.5))</div>
-    <div class="formula-item"><span>Image Discover</span>Ratio · Qualité · Sécurité · Pertinence</div>
   </div>
 </div>
 
-<!-- TABS -->
-<div class="tabs-wrap">
-  <div class="tabs">
-    <button class="tab-btn active" onclick="switchTab('titles')">
-      <span class="tab-icon">✦</span>Titres pCTR
-    </button>
-    <button class="tab-btn" onclick="switchTab('image')">
-      <span class="tab-icon">◈</span>Image Discover
-    </button>
-  </div>
-</div>
-
-<!-- PANEL: TITLES -->
-<div class="panel active" id="panel-titles">
+<!-- TITRES -->
   <section class="input-section">
     <div class="input-label">
       Titres à analyser
@@ -390,11 +440,24 @@
       </button>
     </div>
   </section>
-</div>
 
-<!-- PANEL: IMAGE -->
+
 <div class="panel" id="panel-image">
-  <section class="input-section">
+  <!-- PRO GATE OVERLAY -->
+  <div id="imgProGate" style="display:none;max-width:900px;margin:0 auto;padding:0 3rem 3rem;">
+    <div style="background:var(--surface);border:1px dashed var(--border);border-radius:6px;padding:3rem;text-align:center;">
+      <div style="font-size:2rem;margin-bottom:1rem;">🔒</div>
+      <div style="font-family:var(--serif);font-size:1.4rem;margin-bottom:.6rem;">Fonctionnalité Pro & Enterprise</div>
+      <div style="font-size:.85rem;color:var(--text-muted);line-height:1.75;margin-bottom:1.5rem;max-width:360px;margin-left:auto;margin-right:auto;">
+        L'analyse d'image Discover utilise Claude Vision.<br>
+        Disponible uniquement avec un code <strong style="color:var(--accent)">Pro</strong> ou <strong style="color:var(--purple)">Enterprise</strong>.
+      </div>
+      <a href="index.html#pricing" style="display:inline-block;background:var(--accent);color:#0a0a0b;font-family:var(--mono);font-size:.72rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;padding:.7rem 1.8rem;border-radius:3px;text-decoration:none;">
+        Voir les offres →
+      </a>
+    </div>
+  </div>
+  <section class="input-section" id="imgSection">
     <div class="input-label">
       Image à analyser
       <span>JPG · PNG · WEBP · max ~4 Mo</span>
@@ -524,16 +587,6 @@ function escapeHtml(s) {
 }
 
 /* ═══════════════════════════════════════
-   TABS
-═══════════════════════════════════════ */
-function switchTab(t) {
-  document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', (i===0&&t==='titles')||(i===1&&t==='image')));
-  document.getElementById('panel-titles').classList.toggle('active', t === 'titles');
-  document.getElementById('panel-image').classList.toggle('active', t === 'image');
-  document.getElementById('resultsSection').style.display = 'none';
-}
-
-/* ═══════════════════════════════════════
    TITLE ANALYSIS
 ═══════════════════════════════════════ */
 const textarea = document.getElementById('titlesInput');
@@ -636,156 +689,6 @@ async function runTitleAnalysis() {
 }
 
 /* ═══════════════════════════════════════
-   IMAGE ANALYSIS
-═══════════════════════════════════════ */
-let currentImageB64 = null;
-let currentImageType = 'image/jpeg';
-
-const imageZone = document.getElementById('imageZone');
-imageZone.addEventListener('dragover', e => { e.preventDefault(); imageZone.classList.add('drag-over'); });
-imageZone.addEventListener('dragleave', () => imageZone.classList.remove('drag-over'));
-imageZone.addEventListener('drop', e => {
-  e.preventDefault(); imageZone.classList.remove('drag-over');
-  const f = e.dataTransfer.files[0];
-  if (f) handleImageFile(f);
-});
-
-function handleImageFile(file) {
-  if (!file || !file.type.startsWith('image/')) return;
-  currentImageType = file.type;
-  const reader = new FileReader();
-  reader.onload = ev => {
-    const dataUrl = ev.target.result;
-    currentImageB64 = dataUrl.split(',')[1];
-    document.getElementById('imagePreview').src = dataUrl;
-    document.getElementById('previewWrap').classList.add('has-image');
-    document.getElementById('imgStatus').innerHTML = `<b>1</b> image chargée`;
-    document.getElementById('analyzeImgBtn').disabled = false;
-  };
-  reader.readAsDataURL(file);
-}
-
-function clearImage() {
-  currentImageB64 = null;
-  document.getElementById('imagePreview').src = '';
-  document.getElementById('previewWrap').classList.remove('has-image');
-  document.getElementById('imgStatus').innerHTML = 'Aucune image';
-  document.getElementById('analyzeImgBtn').disabled = true;
-  document.getElementById('imageInput').value = '';
-}
-
-const IMG_PROMPT = `Tu es un expert en optimisation d'images pour Google Discover. Analyse cette image selon les critères Discover et score chaque dimension de 0.0 à 10.0.
-
-DIMENSIONS IMAGE DISCOVER :
-1. aspect_ratio (20%) — Le ratio est-il optimal pour Discover ? (16:9 ou 1:1 = parfait ; trop portrait = pénalisé)
-2. technical_quality (18%) — Résolution, netteté, compression, absence d'artefacts
-3. visual_appeal (18%) — Attrait visuel de la carte Discover : composition, couleurs, sujet central clair
-4. discover_relevance (16%) — L'image correspond-elle à du contenu d'actualité / éditorial de qualité ?
-5. text_overlay (12%) — Score INVERSÉ : texte sur l'image (logos ok, titres = pénalité Google) — 10=pas de texte, 0=beaucoup de texte
-6. safe_search (10%) — Sécurité du contenu (10=totalement safe, 0=problématique)
-7. news_coherence (6%) — L'image s'associe-t-elle naturellement à un sujet d'actualité ?
-
-Fournis aussi :
-- analyse courte (2-3 phrases) des forces et faiblesses
-- 2-3 recommandations concrètes pour améliorer l'image pour Discover
-- og_image_verdict : "conforme" | "acceptable" | "à améliorer" | "non conforme"
-- detected_subject : description courte de ce que tu vois (en français)
-- estimated_dimensions : estimation du ratio (ex: "16:9", "4:3", "carré", "portrait")
-
-Réponds UNIQUEMENT en JSON valide sans markdown :
-{"scores":{"aspect_ratio":<f>,"technical_quality":<f>,"visual_appeal":<f>,"discover_relevance":<f>,"text_overlay":<f>,"safe_search":<f>,"news_coherence":<f>},"analysis":"<s>","improvements":["<s>","<s>","<s>"],"og_image_verdict":"<s>","detected_subject":"<s>","estimated_dimensions":"<s>"}`;
-
-async function analyzeImage(b64, mediaType) {
-  const r = await fetch("/api/analyze-image", {
-    method:"POST", headers:{"Content-Type":"application/json"},
-    body: JSON.stringify({ image_b64: b64, media_type: mediaType, prompt: IMG_PROMPT })
-  });
-  const data = await r.json();
-  if (data.error) throw new Error(data.error);
-  let txt = data.raw.trim();
-  if (txt.startsWith('```')) txt = txt.replace(/^```(?:json)?\s*/,'').replace(/\s*```$/,'');
-  const p = JSON.parse(txt);
-  const scores = {};
-  for (const k in IMG_WEIGHTS) scores[k] = Math.max(0, Math.min(10, parseFloat(p.scores[k]||0)));
-  return {
-    scores, analysis: p.analysis||'', improvements: p.improvements||[],
-    og_verdict: p.og_image_verdict||'—', detected_subject: p.detected_subject||'—',
-    estimated_dimensions: p.estimated_dimensions||'—',
-    composite_score: computeImgScore(scores),
-  };
-}
-
-function renderImageCard(result, previewSrc) {
-  if (result.error) return `<div class="error-card">⚠ ${escapeHtml(result.error)}</div>`;
-  const cls = getImgScoreClass(result.composite_score);
-  const vCls = getVerdictClass(result.composite_score);
-  const vLabel = getVerdictLabel(result.composite_score);
-  const rows = Object.entries(result.scores).map(([k,v])=>`
-    <div class="score-row">
-      <div class="score-name">${IMG_LABELS[k]}</div>
-      <div class="score-bar-wrap"><div class="score-bar" style="width:${v*10}%;background:${getBarColor(v)}"></div></div>
-      <div class="score-num">${v.toFixed(1)}</div>
-    </div>`).join('');
-  const imps = result.improvements.map(s=>`<div class="improvement-item">${escapeHtml(s)}</div>`).join('');
-  const ogColor = result.og_verdict==='conforme'?'var(--green)':result.og_verdict==='acceptable'?'var(--accent)':result.og_verdict==='à améliorer'?'var(--accent2)':'var(--red)';
-
-  return `<div class="img-result-card">
-    <div class="img-card-header">
-      <div>
-        <div class="img-card-label">◈ Analyse image Discover</div>
-        <div style="margin-top:.5rem;"><span class="verdict-badge ${vCls}">${vLabel}</span></div>
-      </div>
-      <div>
-        <div class="img-score-big ${cls}">${result.composite_score.toFixed(1)}<span style="font-size:1.2rem;font-style:normal;color:var(--text-muted)">/10</span></div>
-        <div class="img-score-label">Score Discover</div>
-      </div>
-    </div>
-    <div class="img-card-body">
-      <div class="img-thumb-col">
-        <img class="img-thumb" src="${previewSrc}" alt="Image analysée">
-        <div class="img-tech-specs">
-          <div>Ratio : <b>${escapeHtml(result.estimated_dimensions)}</b></div>
-          <div>og:image : <b style="color:${ogColor}">${escapeHtml(result.og_verdict)}</b></div>
-          <div style="margin-top:.5rem;color:var(--text-dim);font-size:.6rem;line-height:1.6">${escapeHtml(result.detected_subject)}</div>
-        </div>
-      </div>
-      <div class="img-scores-col">
-        <div class="img-scores-grid">${rows}</div>
-      </div>
-    </div>
-    <div class="img-card-analysis">${escapeHtml(result.analysis)}</div>
-    ${imps?`<div class="img-card-improvements">${imps}</div>`:''}
-    <div class="img-card-meta">
-      <div class="meta-item">Score composite <b>${result.composite_score.toFixed(2)}</b></div>
-      <div class="meta-item">og:image <b style="color:${ogColor}">${escapeHtml(result.og_verdict)}</b></div>
-    </div>
-  </div>`;
-}
-
-const imgLoadingMsgs = [
-  'Analyse de l\'image via Claude Vision…',
-  'Évaluation du ratio et de la qualité…',
-  'Scoring des critères Discover…',
-  'Vérification safe search et texte…',
-];
-
-async function runImageAnalysis() {
-  if (!currentImageB64) return;
-  const btn = document.getElementById('analyzeImgBtn');
-  startLoading(btn, imgLoadingMsgs, true);
-  const previewSrc = document.getElementById('imagePreview').src;
-  let html = '';
-  try {
-    const result = await analyzeImage(currentImageB64, currentImageType);
-    html = renderImageCard(result, previewSrc);
-  } catch(e) {
-    html = `<div class="error-card">⚠ ${escapeHtml(e.message)}</div>`;
-  }
-  showResults(html, '1 résultat');
-  stopLoading(btn);
-}
-
-/* ═══════════════════════════════════════
    LOADING / RESULTS HELPERS
 ═══════════════════════════════════════ */
 let _loadingInterval = null;
@@ -795,7 +698,7 @@ function startLoading(btn, messages, isImg) {
   const loadingEl = document.getElementById('loadingState');
   const bar = document.getElementById('loadingBar');
   const txt = document.getElementById('loadingText');
-  if (isImg) bar.classList.add('img-bar'); else bar.classList.remove('img-bar');
+  
   loadingEl.classList.add('active');
   document.getElementById('resultsSection').style.display = 'none';
   txt.textContent = messages[0];
@@ -821,6 +724,116 @@ function showResults(html, countStr) {
   sec.style.display = 'block';
   sec.scrollIntoView({behavior:'smooth', block:'start'});
 }
+
+/* ═══════════════════════════════════════
+   ACCESS GATE
+═══════════════════════════════════════ */
+const VALID_CODES = ['DISCO-PRO', 'DISCO-ENTERPRISE', 'DISCO-STARTER'];
+const IMAGE_CODES = ['DISCO-PRO', 'DISCO-ENTERPRISE']; // Image analysis: Pro + Enterprise only
+let currentCode = '';
+const FREE_LIMIT = 5;
+let isUnlocked = false;
+let freeUsed = parseInt(localStorage.getItem('df_free_used') || '0');
+
+function checkCode(val) {
+  const code = val.trim().toUpperCase();
+  const bar = document.getElementById('gateBar');
+  const icon = document.getElementById('gateIcon');
+  const status = document.getElementById('gateStatus');
+
+  if (VALID_CODES.includes(code)) {
+    isUnlocked = true;
+    currentCode = code;
+    bar.classList.add('unlocked');
+    icon.textContent = '✓';
+    const isImagePlan = IMAGE_CODES.includes(code);
+    status.textContent = isImagePlan ? '✓ Pro — titres + images' : '✓ Starter — titres uniquement';
+    status.className = 'gate-status ok';
+    localStorage.setItem('df_code', code);
+    enableAllFeatures(isImagePlan);
+  } else if (code.length > 3) {
+    status.textContent = '✗ Code invalide';
+    status.className = 'gate-status err';
+  } else {
+    status.textContent = '';
+  }
+}
+
+function checkFreeLimit() {
+  if (isUnlocked) return true;
+  if (freeUsed >= FREE_LIMIT) {
+    alert(`Vous avez utilisé vos ${FREE_LIMIT} analyses gratuites.
+Entrez votre code Pro ou abonnez-vous sur discoforge.com`);
+    return false;
+  }
+  freeUsed++;
+  localStorage.setItem('df_free_used', freeUsed);
+  updateFreeCounter();
+  return true;
+}
+
+function updateFreeCounter() {
+  const note = document.querySelector('.gate-free-note');
+  if (!isUnlocked && note) {
+    const remaining = Math.max(0, FREE_LIMIT - freeUsed);
+    note.innerHTML = `${remaining} analyse${remaining > 1 ? 's' : ''} gratuite${remaining > 1 ? 's' : ''} restante${remaining > 1 ? 's' : ''} · <a href="index.html#pricing">Passer Pro</a>`;
+  }
+}
+
+function enableAllFeatures(hasImageAccess) {
+  const note = document.querySelector('.gate-free-note');
+  if (note) {
+    note.innerHTML = hasImageAccess
+      ? '<span style="color:var(--green)">✓ Pro — titres illimités + analyse image</span>'
+      : '<span style="color:var(--accent)">✓ Starter — titres illimités · <a href="index.html#pricing">Passer Pro pour les images</a></span>';
+  }
+  updateImageGate(hasImageAccess);
+}
+
+function updateImageGate(hasAccess) {
+  const gate = document.getElementById('imgProGate');
+  const section = document.getElementById('imgSection');
+  const imgFooter = section ? section.querySelector('.input-footer') : null;
+  if (!gate || !section) return;
+  if (hasAccess) {
+    gate.style.display = 'none';
+    section.style.display = 'block';
+  } else {
+    gate.style.display = 'block';
+    section.style.display = 'none';
+  }
+}
+
+// Restore saved code on page load
+window.addEventListener('load', () => {
+  const saved = localStorage.getItem('df_code');
+  if (saved && VALID_CODES.includes(saved)) {
+    document.getElementById('gateInput').value = saved;
+    checkCode(saved);
+  } else {
+    updateFreeCounter();
+    updateImageGate(false); // hide image section by default
+  }
+});
+
+// Wrap runTitleAnalysis and runImageAnalysis with gate check
+const _origTitle = runTitleAnalysis;
+runTitleAnalysis = async function() {
+  if (!checkFreeLimit()) return;
+  return _origTitle.apply(this, arguments);
+};
+
+const _origImage = runImageAnalysis;
+runImageAnalysis = async function() {
+  if (!IMAGE_CODES.includes(currentCode)) {
+    alert('L'analyse d'image est réservée aux plans Pro et Enterprise.\nEntrez votre code Pro ou abonnez-vous sur discoforge.com');
+    return;
+  }
+  return _origImage.apply(this, arguments);
+};
+
+
+
 </script>
 </body>
 </html>
