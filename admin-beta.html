@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DiscoForge — Admin Bêta</title>
+<meta name="robots" content="noindex, nofollow">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root { --bg:#0a0a0b; --surface:#111113; --border:#2a2a32; --accent:#e8ff47; --green:#4ade80; --red:#ff4d6d; --purple:#c084fc; --text:#f0efe8; --text-muted:#6b6b7a; --text-dim:#3d3d48; --mono:'DM Mono',monospace; --sans:'DM Sans',sans-serif; }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-weight:300;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:3rem 1rem;}
+.admin-wrap{max-width:560px;width:100%;}
+.admin-header{margin-bottom:2.5rem;}
+.admin-title{font-family:var(--mono);font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:var(--text-muted);margin-bottom:.5rem;}
+h1{font-size:1.4rem;font-weight:500;letter-spacing:-.01em;}
+.gate{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:2rem;margin-bottom:2rem;text-align:center;}
+.gate p{font-size:.85rem;color:var(--text-muted);margin-bottom:1rem;}
+.field{display:flex;flex-direction:column;gap:.4rem;margin-bottom:1rem;}
+.field label{font-family:var(--mono);font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim);}
+input,select{background:var(--bg);border:1px solid var(--border);border-radius:3px;color:var(--text);font-family:var(--mono);font-size:.82rem;padding:.7rem .9rem;outline:none;transition:border-color .2s;caret-color:var(--accent);}
+input:focus,select:focus{border-color:var(--accent);}
+input::placeholder{color:var(--text-dim);}
+.btn{background:var(--accent);color:#0a0a0b;border:none;padding:.75rem 1.8rem;font-family:var(--mono);font-size:.72rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;border-radius:3px;cursor:pointer;transition:all .18s;width:100%;}
+.btn:hover{background:#f5ff7a;}
+.btn:disabled{opacity:.4;cursor:not-allowed;}
+.btn-secondary{background:transparent;color:var(--text-muted);border:1px solid var(--border);}
+.btn-secondary:hover{background:var(--surface);color:var(--text);}
+.result{background:var(--surface);border:1px solid rgba(74,222,128,.25);border-radius:4px;padding:1.5rem;margin-top:1.5rem;display:none;}
+.result.show{display:block;}
+.result-label{font-family:var(--mono);font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim);margin-bottom:.4rem;}
+.result-value{font-family:var(--mono);font-size:.78rem;color:var(--green);word-break:break-all;margin-bottom:.8rem;cursor:pointer;padding:.5rem .7rem;background:var(--bg);border-radius:3px;border:1px solid var(--border);}
+.result-value:hover{border-color:var(--green);}
+.copy-hint{font-family:var(--mono);font-size:.58rem;color:var(--text-dim);}
+.divider{height:1px;background:var(--border);margin:2rem 0;}
+.form-card{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:2rem;}
+.form-card h2{font-size:1rem;font-weight:500;margin-bottom:1.5rem;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;}
+.error{color:var(--red);font-family:var(--mono);font-size:.65rem;margin-top:.4rem;}
+</style>
+</head>
+<body>
+
+<div class="admin-wrap">
+  <div class="admin-header">
+    <div class="admin-title">DiscoForge · Admin</div>
+    <h1>Générateur d'invitations Bêta</h1>
+  </div>
+
+  <!-- AUTH GATE -->
+  <div id="authGate" class="gate">
+    <p>Cette page est réservée à l'administrateur.</p>
+    <div class="field">
+      <label>Mot de passe admin</label>
+      <input type="password" id="adminSecret" placeholder="Votre ADMIN_SECRET Cloudflare" onkeydown="if(event.key==='Enter')unlockAdmin()">
+    </div>
+    <button class="btn" onclick="unlockAdmin()">Accéder →</button>
+    <div class="error" id="authError"></div>
+  </div>
+
+  <!-- ADMIN PANEL -->
+  <div id="adminPanel" style="display:none;">
+    <div class="form-card">
+      <h2>Créer un lien d'invitation</h2>
+      <div class="field">
+        <label>Email du bêta testeur *</label>
+        <input type="email" id="betaEmail" placeholder="contact@media.fr">
+      </div>
+      <div class="field">
+        <label>Nom (affiché sur la page d'accueil)</label>
+        <input type="text" id="betaName" placeholder="Jean Dupont / Le Monde">
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label>Durée d'accès</label>
+          <select id="betaDays">
+            <option value="7" selected>7 jours</option>
+            <option value="14">14 jours</option>
+            <option value="30">30 jours</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Mot de passe admin</label>
+          <input type="password" id="adminSecretField" placeholder="ADMIN_SECRET">
+        </div>
+      </div>
+      <button class="btn" id="createBtn" onclick="createBetaLink()">Générer le lien →</button>
+      <div class="error" id="createError"></div>
+
+      <div class="result" id="resultBox">
+        <div class="result-label">Lien d'invitation (cliquer pour copier)</div>
+        <div class="result-value" id="betaUrl" onclick="copyUrl()"></div>
+        <div class="copy-hint">✓ Cliquez pour copier · Envoyez ce lien par email à la personne</div>
+        <div class="divider" style="margin:1rem 0;"></div>
+        <div class="result-label">Email destinataire</div>
+        <div style="font-family:var(--mono);font-size:.75rem;color:var(--text-muted);margin-bottom:.8rem;" id="resultEmail"></div>
+        <div class="result-label">Expire le</div>
+        <div style="font-family:var(--mono);font-size:.75rem;color:var(--text-muted);" id="resultExpires"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let adminSecretValue = '';
+
+function unlockAdmin() {
+  const secret = document.getElementById('adminSecret').value.trim();
+  if (!secret) { document.getElementById('authError').textContent = 'Entrez le mot de passe.'; return; }
+  adminSecretValue = secret;
+  document.getElementById('authGate').style.display = 'none';
+  document.getElementById('adminPanel').style.display = 'block';
+  document.getElementById('adminSecretField').value = secret;
+}
+
+async function createBetaLink() {
+  const email = document.getElementById('betaEmail').value.trim();
+  const name = document.getElementById('betaName').value.trim();
+  const days = parseInt(document.getElementById('betaDays').value);
+  const secret = document.getElementById('adminSecretField').value.trim() || adminSecretValue;
+  const errEl = document.getElementById('createError');
+  const btn = document.getElementById('createBtn');
+
+  errEl.textContent = '';
+  if (!email || !email.includes('@')) { errEl.textContent = 'Email invalide.'; return; }
+  if (!secret) { errEl.textContent = 'Mot de passe admin manquant.'; return; }
+
+  btn.disabled = true;
+  btn.textContent = 'Génération…';
+
+  try {
+    const resp = await fetch('/api/beta-access', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'create', email, name, days, secret })
+    });
+    const data = await resp.json();
+
+    if (data.success) {
+      document.getElementById('betaUrl').textContent = data.url;
+      document.getElementById('resultEmail').textContent = data.email;
+      document.getElementById('resultExpires').textContent = new Date(data.expires_at).toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+      document.getElementById('resultBox').classList.add('show');
+      btn.textContent = '✓ Lien créé — générer un autre';
+      btn.disabled = false;
+      document.getElementById('betaEmail').value = '';
+      document.getElementById('betaName').value = '';
+    } else {
+      errEl.textContent = data.error || 'Erreur serveur.';
+      btn.disabled = false;
+      btn.textContent = 'Générer le lien →';
+    }
+  } catch(e) {
+    errEl.textContent = '⚠ Erreur réseau : ' + e.message;
+    btn.disabled = false;
+    btn.textContent = 'Générer le lien →';
+  }
+}
+
+function copyUrl() {
+  const url = document.getElementById('betaUrl').textContent;
+  navigator.clipboard.writeText(url).then(() => {
+    document.querySelector('.copy-hint').textContent = '✓ Copié dans le presse-papier !';
+    setTimeout(() => { document.querySelector('.copy-hint').textContent = '✓ Cliquez pour copier · Envoyez ce lien par email à la personne'; }, 2000);
+  });
+}
+</script>
+</body>
+</html>
