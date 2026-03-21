@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DiscoForge — Accès Bêta</title>
+<meta name="robots" content="noindex, nofollow">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0b; --surface: #111113; --border: #2a2a32;
+  --accent: #e8ff47; --green: #4ade80; --red: #ff4d6d;
+  --purple: #c084fc; --text: #f0efe8; --text-muted: #6b6b7a; --text-dim: #3d3d48;
+  --mono: 'DM Mono', monospace; --serif: 'DM Serif Display', serif; --sans: 'DM Sans', sans-serif;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: var(--sans); font-weight: 300; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem; }
+body::before { content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 9999; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E"); opacity: 0.5; }
+
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 3rem; max-width: 480px; width: 100%; text-align: center; animation: card-in .5s ease both; }
+@keyframes card-in { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+/* Loading state */
+.state-loading .icon { font-size: 2rem; animation: spin 1s linear infinite; display: inline-block; }
+@keyframes spin { to{transform:rotate(360deg)} }
+
+/* States */
+.state { display: none; }
+.state.active { display: block; }
+
+.big-icon { font-size: 3rem; margin-bottom: 1.2rem; }
+.card-title { font-family: var(--serif); font-size: 1.8rem; letter-spacing: -.02em; margin-bottom: .6rem; }
+.card-sub { font-size: .87rem; color: var(--text-muted); line-height: 1.75; margin-bottom: 2rem; }
+
+/* Email form */
+.email-form { display: flex; flex-direction: column; gap: .8rem; margin-bottom: 1.5rem; }
+.email-input { background: var(--bg); border: 1px solid var(--border); border-radius: 4px; color: var(--text); font-family: var(--sans); font-size: .9rem; padding: .85rem 1rem; outline: none; transition: border-color .2s; caret-color: var(--accent); text-align: center; }
+.email-input:focus { border-color: var(--accent); }
+.email-input::placeholder { color: var(--text-dim); }
+.submit-btn { background: var(--purple); color: #0a0a0b; border: none; padding: .9rem; font-family: var(--mono); font-size: .75rem; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; border-radius: 3px; cursor: pointer; transition: all .18s; }
+.submit-btn:hover { background: #d8b4fe; }
+.submit-btn:disabled { opacity: .4; cursor: not-allowed; }
+.error-msg { font-family: var(--mono); font-size: .65rem; color: var(--red); min-height: 1rem; }
+
+/* Beta badge */
+.beta-badge { display: inline-flex; align-items: center; gap: .4rem; font-family: var(--mono); font-size: .62rem; letter-spacing: .1em; text-transform: uppercase; background: rgba(192,132,252,.1); color: var(--purple); border: 1px solid rgba(192,132,252,.25); padding: .28rem .8rem; border-radius: 2rem; margin-bottom: 1.5rem; }
+.beta-dot { width: 6px; height: 6px; background: var(--purple); border-radius: 50%; animation: pulse 2s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.4)} }
+
+/* Access links */
+.access-links { display: flex; flex-direction: column; gap: .6rem; margin: 1.5rem 0; }
+.access-link { display: flex; align-items: center; justify-content: space-between; background: var(--bg); border: 1px solid var(--border); border-radius: 4px; padding: .9rem 1.2rem; text-decoration: none; transition: border-color .15s; }
+.access-link:hover { border-color: var(--purple); }
+.link-title { font-size: .85rem; color: var(--text); text-align: left; margin-bottom: .15rem; }
+.link-desc { font-family: var(--mono); font-size: .6rem; color: var(--text-muted); }
+.link-arrow { font-family: var(--mono); font-size: .8rem; color: var(--purple); flex-shrink: 0; }
+
+/* Days counter */
+.days-counter { background: rgba(192,132,252,.06); border: 1px solid rgba(192,132,252,.15); border-radius: 4px; padding: .9rem; margin-bottom: 1.5rem; }
+.days-num { font-family: var(--serif); font-size: 2.2rem; font-style: italic; color: var(--purple); }
+.days-label { font-family: var(--mono); font-size: .6rem; letter-spacing: .12em; text-transform: uppercase; color: var(--text-muted); margin-top: .2rem; }
+
+.footer-note { font-size: .75rem; color: var(--text-dim); line-height: 1.7; }
+.footer-note a { color: var(--text-muted); }
+</style>
+</head>
+<body>
+
+<div class="card">
+
+  <!-- LOADING -->
+  <div class="state active" id="state-loading">
+    <div class="state-loading">
+      <div class="icon">◈</div>
+    </div>
+    <div style="font-family:var(--mono);font-size:.7rem;color:var(--text-muted);margin-top:1rem;letter-spacing:.08em;">Vérification du lien…</div>
+  </div>
+
+  <!-- EMAIL FORM — vérification email -->
+  <div class="state" id="state-email">
+    <div class="big-icon">✉️</div>
+    <h1 class="card-title">Confirmez votre email</h1>
+    <p class="card-sub">Ce lien bêta est personnel. Entrez l'adresse email à laquelle vous avez reçu l'invitation pour activer votre accès.</p>
+    <div class="email-form">
+      <input class="email-input" type="email" id="emailInput" placeholder="votre@email.com" autocomplete="email">
+      <button class="submit-btn" id="submitBtn" onclick="verifyEmail()">Activer mon accès →</button>
+    </div>
+    <div class="error-msg" id="errorMsg"></div>
+    <p class="footer-note">Vous avez reçu ce lien de Nicolas Dayez.<br>Ce lien est à usage unique et personnel.</p>
+  </div>
+
+  <!-- SUCCESS -->
+  <div class="state" id="state-success">
+    <div class="beta-badge"><span class="beta-dot"></span> Bêta activé</div>
+    <h1 class="card-title">Bienvenue <span id="betaName"></span> !</h1>
+    <p class="card-sub">Votre accès bêta complet est activé. Profitez de toutes les fonctionnalités DiscoForge Pro gratuitement pendant votre période d'essai.</p>
+    <div class="days-counter">
+      <div class="days-num" id="daysLeft">7</div>
+      <div class="days-label">jours restants</div>
+    </div>
+    <div class="access-links">
+      <a href="discoforge.html" class="access-link">
+        <div><div class="link-title">✦ Analyser titres & images</div><div class="link-desc">pCTR · Vision AI · 8 dimensions</div></div>
+        <div class="link-arrow">→</div>
+      </a>
+      <a href="dashboard.html" class="access-link">
+        <div><div class="link-title">◈ Dashboard Discover</div><div class="link-desc">Import Search Console CSV · Métriques</div></div>
+        <div class="link-arrow">→</div>
+      </a>
+    </div>
+    <p class="footer-note">Accès valide jusqu'au <span id="expiresDate"></span>.<br>Questions ? <a href="mailto:dayez.nicolas@gmail.com">dayez.nicolas@gmail.com</a></p>
+  </div>
+
+  <!-- EXPIRED -->
+  <div class="state" id="state-expired">
+    <div class="big-icon">⏰</div>
+    <h1 class="card-title">Accès expiré</h1>
+    <p class="card-sub">Votre période bêta de 7 jours est terminée. Pour continuer à utiliser DiscoForge, choisissez un plan.</p>
+    <a href="index.html#pricing" style="display:block;background:var(--accent);color:#0a0a0b;font-family:var(--mono);font-size:.75rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;padding:.9rem;border-radius:3px;text-decoration:none;margin-bottom:1rem;">Voir les offres →</a>
+    <p class="footer-note">Besoin d'aide ? <a href="mailto:dayez.nicolas@gmail.com">dayez.nicolas@gmail.com</a></p>
+  </div>
+
+  <!-- INVALID -->
+  <div class="state" id="state-invalid">
+    <div class="big-icon">❌</div>
+    <h1 class="card-title">Lien invalide</h1>
+    <p class="card-sub">Ce lien d'accès bêta n'existe pas ou a déjà été utilisé. Contactez Nicolas si vous pensez qu'il s'agit d'une erreur.</p>
+    <p class="footer-note"><a href="mailto:dayez.nicolas@gmail.com">dayez.nicolas@gmail.com</a></p>
+  </div>
+
+</div>
+
+<script>
+let betaToken = null;
+
+function showState(id) {
+  document.querySelectorAll('.state').forEach(s => s.classList.remove('active'));
+  document.getElementById('state-' + id).classList.add('active');
+}
+
+function getTokenFromURL() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get('token');
+}
+
+async function verifyEmail() {
+  const email = document.getElementById('emailInput').value.trim();
+  const errMsg = document.getElementById('errorMsg');
+  const btn = document.getElementById('submitBtn');
+
+  if (!email || !email.includes('@')) {
+    errMsg.textContent = 'Entrez une adresse email valide.';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Vérification…';
+  errMsg.textContent = '';
+
+  try {
+    const resp = await fetch('/api/beta-access', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'verify', token: betaToken, email })
+    });
+    const data = await resp.json();
+
+    if (data.valid) {
+      // Sauvegarde la session bêta
+      localStorage.setItem('df_token', btoa(betaToken + ':' + Date.now()));
+      localStorage.setItem('df_plan', 'beta');
+      localStorage.setItem('df_features', JSON.stringify(data.features));
+      localStorage.setItem('df_beta_expires', data.expires_at);
+
+      // Affiche la page succès
+      document.getElementById('betaName').textContent = data.name || '';
+      document.getElementById('daysLeft').textContent = data.days_left;
+      document.getElementById('expiresDate').textContent = new Date(data.expires_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+      showState('success');
+    } else {
+      btn.disabled = false;
+      btn.textContent = 'Activer mon accès →';
+      if (data.reason === 'expired') {
+        showState('expired');
+      } else if (data.reason === 'email_mismatch') {
+        errMsg.textContent = '✗ Email incorrect pour ce lien d\'invitation.';
+      } else {
+        errMsg.textContent = '✗ Erreur de vérification. Contactez Nicolas.';
+      }
+    }
+  } catch(e) {
+    btn.disabled = false;
+    btn.textContent = 'Activer mon accès →';
+    errMsg.textContent = '⚠ Erreur réseau. Réessayez.';
+  }
+}
+
+// Allow Enter key
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('emailInput')?.addEventListener('keydown', e => {
+    if (e.key === 'Enter') verifyEmail();
+  });
+});
+
+// Init
+window.addEventListener('load', () => {
+  betaToken = getTokenFromURL();
+
+  if (!betaToken) {
+    showState('invalid');
+    return;
+  }
+
+  // Vérifie si déjà une session active valide
+  const savedPlan = localStorage.getItem('df_plan');
+  const savedExpires = localStorage.getItem('df_beta_expires');
+  if (savedPlan === 'beta' && savedExpires) {
+    const expires = parseInt(savedExpires);
+    if (Date.now() < expires) {
+      const daysLeft = Math.ceil((expires - Date.now()) / (1000 * 60 * 60 * 24));
+      document.getElementById('betaName').textContent = '';
+      document.getElementById('daysLeft').textContent = daysLeft;
+      document.getElementById('expiresDate').textContent = new Date(expires).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+      showState('success');
+      return;
+    } else {
+      // Session expirée
+      localStorage.removeItem('df_token');
+      localStorage.removeItem('df_plan');
+      localStorage.removeItem('df_features');
+      localStorage.removeItem('df_beta_expires');
+      showState('expired');
+      return;
+    }
+  }
+
+  // Pas de session — demande l'email
+  showState('email');
+});
+</script>
+</body>
+</html>
