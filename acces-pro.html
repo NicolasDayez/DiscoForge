@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DiscoForge — Accès Pro activé</title>
+<meta name="robots" content="noindex, nofollow">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0b; --surface: #111113; --border: #2a2a32;
+  --accent: #e8ff47; --accent2: #4ade80; --text: #f0efe8;
+  --text-muted: #6b6b7a; --text-dim: #3d3d48;
+  --mono: 'DM Mono', monospace; --serif: 'DM Serif Display', serif; --sans: 'DM Sans', sans-serif;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: var(--sans); font-weight: 300; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; }
+body::before {
+  content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 9999;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  opacity: 0.5;
+}
+
+.card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 6px;
+  padding: 3rem 3.5rem; max-width: 520px; width: 100%; text-align: center;
+  animation: card-in .5s ease both;
+}
+@keyframes card-in { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+.check-circle {
+  width: 64px; height: 64px; border-radius: 50%;
+  background: rgba(74,222,128,.1); border: 1px solid rgba(74,222,128,.3);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 2rem; font-size: 1.8rem;
+  animation: pop .4s .2s cubic-bezier(0.175,0.885,0.32,1.275) both;
+}
+@keyframes pop { from{transform:scale(0)} to{transform:scale(1)} }
+
+.card-title { font-family: var(--serif); font-size: 2rem; letter-spacing: -.02em; margin-bottom: .6rem; }
+.card-title em { font-style: italic; color: var(--accent2); }
+.card-sub { font-size: .9rem; color: var(--text-muted); line-height: 1.7; margin-bottom: 2.5rem; }
+
+.code-block {
+  background: var(--bg); border: 1px solid var(--border); border-radius: 4px;
+  padding: 1.5rem; margin-bottom: 1rem; position: relative;
+}
+.code-label { font-family: var(--mono); font-size: .6rem; letter-spacing: .16em; text-transform: uppercase; color: var(--text-dim); margin-bottom: .8rem; }
+.code-value {
+  font-family: var(--mono); font-size: 2.2rem; font-weight: 500;
+  letter-spacing: .3em; color: var(--accent); cursor: pointer;
+  user-select: all; transition: opacity .15s;
+}
+.code-value:hover { opacity: .8; }
+.copy-btn {
+  position: absolute; top: .8rem; right: .8rem;
+  background: none; border: 1px solid var(--border); color: var(--text-muted);
+  font-family: var(--mono); font-size: .6rem; letter-spacing: .1em; text-transform: uppercase;
+  padding: .25rem .6rem; border-radius: 3px; cursor: pointer; transition: all .15s;
+}
+.copy-btn:hover { border-color: var(--accent); color: var(--accent); }
+.copy-btn.copied { border-color: var(--accent2); color: var(--accent2); }
+
+.code-note { font-family: var(--mono); font-size: .65rem; color: var(--text-dim); margin-bottom: 2rem; }
+.code-note strong { color: var(--text-muted); }
+
+.access-links { display: flex; flex-direction: column; gap: .7rem; margin-bottom: 2rem; }
+.access-link {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--bg); border: 1px solid var(--border); border-radius: 4px;
+  padding: 1rem 1.4rem; text-decoration: none; transition: border-color .15s;
+}
+.access-link:hover { border-color: var(--accent); }
+.link-info { text-align: left; }
+.link-title { font-size: .85rem; color: var(--text); margin-bottom: .2rem; }
+.link-desc { font-family: var(--mono); font-size: .62rem; color: var(--text-muted); }
+.link-arrow { font-family: var(--mono); font-size: .8rem; color: var(--accent); }
+
+.divider { height: 1px; background: var(--border); margin: 1.8rem 0; }
+
+.plan-badge {
+  display: inline-flex; align-items: center; gap: .4rem;
+  font-family: var(--mono); font-size: .62rem; letter-spacing: .1em; text-transform: uppercase;
+  background: rgba(232,255,71,.08); color: var(--accent); border: 1px solid rgba(232,255,71,.2);
+  padding: .3rem .8rem; border-radius: 2rem; margin-bottom: 1.5rem;
+}
+.plan-dot { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; animation: pulse 2s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.4)} }
+
+.footer-note { font-size: .78rem; color: var(--text-dim); line-height: 1.7; }
+.footer-note a { color: var(--text-muted); }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="check-circle">✓</div>
+
+  <div class="plan-badge"><span class="plan-dot"></span> Pro activé</div>
+
+  <h1 class="card-title">Bienvenue dans<br><em>DiscoForge Pro</em></h1>
+  <p class="card-sub">Votre paiement a été confirmé. Voici votre code d'accès — conservez-le précieusement.</p>
+
+  <div class="code-block">
+    <div class="code-label">Votre code d'accès</div>
+    <div class="code-value" id="codeDisplay" onclick="copyCode()">DISCO-PRO</div>
+    <button class="copy-btn" id="copyBtn" onclick="copyCode()">Copier</button>
+  </div>
+  <div class="code-note">
+    <strong>Important :</strong> Ce code vous donne accès à toutes les fonctionnalités Pro.<br>
+    Ne le partagez pas — il est lié à votre abonnement.
+  </div>
+
+  <div class="access-links">
+    <a href="discoforge.html" class="access-link">
+      <div class="link-info">
+        <div class="link-title">✦ Analyser titres & images</div>
+        <div class="link-desc">pCTR · Vision AI · 8 dimensions</div>
+      </div>
+      <div class="link-arrow">→</div>
+    </a>
+    <a href="dashboard.html" class="access-link">
+      <div class="link-info">
+        <div class="link-title">◈ Dashboard Discover</div>
+        <div class="link-desc">Import Search Console CSV · Métriques</div>
+      </div>
+      <div class="link-arrow">→</div>
+    </a>
+  </div>
+
+  <div class="divider"></div>
+  <p class="footer-note">
+    Une question ? <a href="mailto:dayez.nicolas@gmail.com">dayez.nicolas@gmail.com</a><br>
+    Gérer votre abonnement : <a href="https://billing.stripe.com" target="_blank">Portail Stripe</a>
+  </p>
+</div>
+
+<script>
+// Le code affiché — change-le quand tu veux le renouveler
+const ACCESS_CODE = "DISCO-PRO";
+document.getElementById('codeDisplay').textContent = ACCESS_CODE;
+
+function copyCode() {
+  navigator.clipboard.writeText(ACCESS_CODE).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = '✓ Copié';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copier'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+</script>
+</body>
+</html>
