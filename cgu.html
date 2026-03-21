@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Instrument+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5f2eb;--ink:#0e0d0b;--ink2:#3a3832;--ink3:#8a8780;--ink4:#c4c1b8;--accent:#d4380d;--accent2:#1a6b3a;--surface:#eeeae0;--surface2:#e6e2d6;--border:#d4d0c4;--border2:#c0bbb0;--gold:#b8860b;--serif:'Playfair Display',serif;--sans:'Instrument Sans',sans-serif;--mono:'JetBrains Mono',monospace;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-weight:300;overflow-x:hidden;}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");opacity:.6;}
+nav{position:sticky;top:0;left:0;right:0;z-index:100;padding:1.1rem 3rem;display:flex;align-items:center;justify-content:space-between;background:rgba(245,242,235,0.95);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);}
+.nav-logo{font-family:var(--serif);font-size:1.4rem;font-weight:700;color:var(--ink);text-decoration:none;letter-spacing:-.02em;display:flex;align-items:center;gap:.5rem;}
+.nav-dot{width:7px;height:7px;background:var(--accent);border-radius:50%;animation:bdot 2.5s ease-in-out infinite;}
+@keyframes bdot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.3)}}
+.nav-links{display:flex;align-items:center;gap:1.5rem;}
+.nav-links a{font-size:.78rem;color:var(--ink2);text-decoration:none;font-weight:400;letter-spacing:.04em;transition:color .15s;}
+.nav-links a:hover{color:var(--accent);}
+.nav-cta{background:var(--ink);color:var(--bg);padding:.5rem 1.2rem;border-radius:2px;font-size:.75rem;font-weight:500;letter-spacing:.06em;text-decoration:none;transition:background .18s;font-family:var(--mono);}
+.nav-cta:hover{background:var(--accent);color:#fff;}
+.page-hero{padding:5rem 3rem 3rem;max-width:860px;margin:0 auto;}
+.page-kicker{font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem;display:flex;align-items:center;gap:.7rem;}
+.page-kicker::before{content:'';width:1.8rem;height:1px;background:var(--accent);}
+.page-h1{font-family:var(--serif);font-size:clamp(2rem,5vw,3.2rem);line-height:1.07;letter-spacing:-.03em;font-weight:700;margin-bottom:1rem;}
+.page-h1 em{font-style:italic;color:var(--accent);}
+.page-meta{font-family:var(--mono);font-size:.65rem;color:var(--ink3);letter-spacing:.08em;margin-bottom:2rem;}
+.page-content{max-width:860px;margin:0 auto;padding:0 3rem 5rem;}
+.page-content h2{font-family:var(--serif);font-size:1.5rem;font-weight:700;letter-spacing:-.02em;margin:2.5rem 0 1rem;padding-top:2rem;border-top:1px solid var(--border);}
+.page-content h2:first-child{margin-top:0;padding-top:0;border-top:none;}
+.page-content h3{font-family:var(--serif);font-size:1.1rem;font-weight:700;margin:1.5rem 0 .6rem;}
+.page-content p{font-size:.9rem;line-height:1.85;color:var(--ink2);margin-bottom:1rem;}
+.page-content ul,.page-content ol{padding-left:1.5rem;margin-bottom:1rem;}
+.page-content li{font-size:.9rem;line-height:1.75;color:var(--ink2);margin-bottom:.4rem;}
+.page-content strong{color:var(--ink);font-weight:500;}
+.page-content a{color:var(--accent);text-decoration:underline;text-underline-offset:3px;}
+.page-content .highlight{background:var(--surface);border:1px solid var(--border);border-radius:3px;padding:1.2rem 1.5rem;margin:1.5rem 0;font-family:var(--mono);font-size:.78rem;line-height:1.75;color:var(--ink2);}
+.page-content .highlight strong{color:var(--accent);}
+footer{background:var(--ink);border-top:1px solid #1a1a18;padding:2rem 3rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;}
+.footer-logo{font-family:var(--serif);font-size:1.1rem;color:rgba(245,242,235,.3);}
+.footer-links{display:flex;gap:1.5rem;flex-wrap:wrap;}
+.footer-links a{font-family:var(--mono);font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(245,242,235,.2);text-decoration:none;transition:color .15s;}
+.footer-links a:hover{color:rgba(245,242,235,.55);}
+.footer-copy{font-family:var(--mono);font-size:.56rem;letter-spacing:.08em;color:rgba(245,242,235,.15);text-transform:uppercase;}
+@media(max-width:720px){nav{padding:1rem 1.4rem;}.nav-links{display:none;}.page-hero,.page-content{padding-left:1.4rem;padding-right:1.4rem;}}
+</style>
+<title>Conditions Générales d'Utilisation — DiscoForge</title>
+</head>
+<body><nav>
+  <a href="index.html" class="nav-logo">DiscoForge <span class="nav-dot"></span></a>
+  <div class="nav-links">
+    <a href="discoforge.html">Analyser</a>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="blog.html">Blog</a>
+    <a href="contact.html">Contact</a>
+  </div>
+  <a href="discoforge.html" class="nav-cta">Essai gratuit →</a>
+</nav>
+<div class="page-hero">
+  <div class="page-kicker">Conditions</div>
+  <h1 class="page-h1">Conditions Générales <em>d'Utilisation</em></h1>
+  <div class="page-meta">Version 1.0 · En vigueur depuis Mars 2026</div>
+</div>
+<div class="page-content">
+  <h2>Article 1 — Objet</h2>
+  <p>Les présentes Conditions Générales d'Utilisation (CGU) régissent l'accès et l'utilisation du service DiscoForge, outil d'analyse et d'optimisation de contenus pour Google Discover, accessible sur discoforge.com.</p>
+  <h2>Article 2 — Acceptation</h2>
+  <p>L'utilisation du service vaut acceptation pleine et entière des présentes CGU. Si vous n'acceptez pas ces conditions, vous devez cesser d'utiliser le service.</p>
+  <h2>Article 3 — Description du service</h2>
+  <p>DiscoForge propose :</p>
+  <ul>
+    <li>Une analyse prédictive du taux de clic (pCTR) de titres d'articles pour Google Discover</li>
+    <li>Un scoring d'images og selon les critères Discover</li>
+    <li>Un tableau de bord d'analyse de performances via import Search Console</li>
+    <li>Des recommandations éditoriales générées par intelligence artificielle</li>
+  </ul>
+  <h2>Article 4 — Accès au service</h2>
+  <p>Un accès gratuit limité (5 analyses) est proposé sans inscription. Les fonctionnalités complètes nécessitent un abonnement payant selon les tarifs en vigueur sur la page <a href="index.html#pricing">Tarifs</a>.</p>
+  <h2>Article 5 — Obligations de l'utilisateur</h2>
+  <p>L'utilisateur s'engage à :</p>
+  <ul>
+    <li>Ne pas utiliser le service à des fins illicites ou contraires aux présentes CGU</li>
+    <li>Ne pas tenter de contourner les mécanismes d'accès ou de paiement</li>
+    <li>Ne pas partager son code d'accès avec des tiers</li>
+    <li>Fournir des informations exactes lors de l'inscription ou du paiement</li>
+  </ul>
+  <h2>Article 6 — Propriété intellectuelle</h2>
+  <p>L'utilisateur conserve la propriété de ses données (titres, images, URLs analysées). DiscoForge ne revendique aucun droit sur les contenus analysés.</p>
+  <h2>Article 7 — Disponibilité du service</h2>
+  <p>DiscoForge s'efforce d'assurer une disponibilité maximale du service mais ne peut garantir une disponibilité ininterrompue. Des maintenances peuvent être effectuées sans préavis.</p>
+  <h2>Article 8 — Limitation de responsabilité</h2>
+  <p>Les scores et recommandations sont fournis à titre indicatif. DiscoForge ne garantit pas d'amélioration des performances Discover. La responsabilité de l'éditeur ne saurait être engagée pour les décisions éditoriales prises sur la base des analyses.</p>
+  <h2>Article 9 — Modification des CGU</h2>
+  <p>DiscoForge se réserve le droit de modifier les présentes CGU. Les utilisateurs seront informés par email ou notification sur le service.</p>
+  <h2>Article 10 — Droit applicable</h2>
+  <p>Les présentes CGU sont soumises au droit français. Tout litige sera soumis aux juridictions compétentes de France.</p>
+</div><footer>
+  <div class="footer-logo">DiscoForge</div>
+  <div class="footer-links">
+    <a href="mentions-legales.html">Mentions légales</a>
+    <a href="confidentialite.html">Confidentialité</a>
+    <a href="cgu.html">CGU</a>
+    <a href="cgv.html">CGV</a>
+    <a href="cookies.html">Cookies</a>
+    <a href="contact.html">Contact</a>
+    <a href="a-propos.html">À propos</a>
+    <a href="blog.html">Blog</a>
+  </div>
+  <div class="footer-copy">© 2026 DiscoForge</div>
+</footer>
+</body></html>
