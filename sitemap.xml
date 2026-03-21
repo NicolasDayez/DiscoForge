@@ -11,21 +11,3 @@
     <priority>0.9</priority>
   </url>
 </urlset>
-```
-
-Commit : `add sitemap.xml`
-
----
-
-**Fichier 2 — `robots.txt`**
-
-**Add file → Create new file** → nom : `robots.txt`
-```
-User-agent: *
-Allow: /
-Disallow: /admin-beta.html
-Disallow: /acces-pro.html
-Disallow: /beta.html
-Disallow: /dashboard.html
-
-Sitemap: https://discoforge.com/sitemap.xml
