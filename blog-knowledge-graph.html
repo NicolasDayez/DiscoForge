@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Entities everywhere : le Knowledge Graph, architecture invisible de Google — DiscoForge Blog</title>
+<meta name="description" content="Le Knowledge Graph est l'infrastructure qui permet à Google de comprendre le monde réel. Entités, relations, graph embeddings — comment cette architecture façonne Discover.">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Instrument+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5f2eb;--ink:#0e0d0b;--ink2:#3a3832;--ink3:#8a8780;--ink4:#c4c1b8;--accent:#d4380d;--accent2:#1a6b3a;--surface:#eeeae0;--surface2:#e6e2d6;--border:#d4d0c4;--border2:#c0bbb0;--gold:#b8860b;--serif:'Playfair Display',serif;--sans:'Instrument Sans',sans-serif;--mono:'JetBrains Mono',monospace;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-weight:300;overflow-x:hidden;}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");opacity:.6;}
+nav{position:sticky;top:0;z-index:100;padding:1.1rem 3rem;display:flex;align-items:center;justify-content:space-between;background:rgba(245,242,235,.95);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);}
+.nav-logo{font-family:var(--serif);font-size:1.4rem;font-weight:700;color:var(--ink);text-decoration:none;letter-spacing:-.02em;display:flex;align-items:center;gap:.5rem;}
+.nav-dot{width:7px;height:7px;background:var(--accent);border-radius:50%;animation:bdot 2.5s ease-in-out infinite;}
+@keyframes bdot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.3)}}
+.nav-links{display:flex;align-items:center;gap:1.5rem;}
+.nav-links a{font-size:.78rem;color:var(--ink2);text-decoration:none;transition:color .15s;}
+.nav-links a:hover{color:var(--accent);}
+.nav-cta{background:var(--ink);color:var(--bg);padding:.5rem 1.2rem;border-radius:2px;font-size:.75rem;font-weight:500;letter-spacing:.06em;text-decoration:none;transition:background .18s;font-family:var(--mono);}
+.nav-cta:hover{background:var(--accent);color:#fff;}
+.article-wrap{display:grid;grid-template-columns:1fr 280px;gap:4rem;max-width:1100px;margin:0 auto;padding:4rem 3rem 5rem;}
+.article-main{}
+.article-kicker{font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem;display:flex;align-items:center;gap:.7rem;}
+.article-kicker::before{content:'';width:1.8rem;height:1px;background:var(--accent);}
+.article-h1{font-family:var(--serif);font-size:clamp(2rem,5vw,3.2rem);line-height:1.07;letter-spacing:-.03em;font-weight:700;margin-bottom:1.2rem;}
+.article-h1 em{font-style:italic;color:var(--accent);}
+.article-meta{display:flex;gap:1.5rem;font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:2.5rem;padding-bottom:2rem;border-bottom:1px solid var(--border);}
+.article-body{font-size:.92rem;line-height:1.88;color:var(--ink2);}
+.article-body h2{font-family:var(--serif);font-size:1.55rem;font-weight:700;letter-spacing:-.02em;color:var(--ink);margin:2.5rem 0 1rem;padding-top:2rem;border-top:1px solid var(--border);}
+.article-body h3{font-family:var(--serif);font-size:1.1rem;font-weight:700;color:var(--ink);margin:1.5rem 0 .6rem;}
+.article-body p{margin-bottom:1.1rem;}
+.article-body strong{color:var(--ink);font-weight:500;}
+.article-body ul,.article-body ol{padding-left:1.5rem;margin:1rem 0 1.1rem;}
+.article-body li{margin-bottom:.5rem;}
+.article-body .callout{background:var(--surface);border-left:3px solid var(--accent);padding:1.1rem 1.4rem;margin:1.5rem 0;border-radius:0 3px 3px 0;}
+.article-body .callout strong{color:var(--accent);}
+.article-body a{color:var(--accent);text-decoration:underline;text-underline-offset:3px;}
+.article-sidebar{}
+.sidebar-card{background:var(--surface);border:1px solid var(--border);border-radius:3px;padding:1.4rem;margin-bottom:1.2rem;position:sticky;top:90px;}
+.sc-title{font-family:var(--mono);font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink3);margin-bottom:1rem;}
+.sc-cta{display:block;background:var(--ink);color:var(--bg);text-align:center;padding:.8rem;font-family:var(--mono);font-size:.68rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;border-radius:2px;transition:background .18s;margin-bottom:.8rem;}
+.sc-cta:hover{background:var(--accent);}
+.sc-note{font-size:.76rem;color:var(--ink3);line-height:1.65;}
+.related-links{display:flex;flex-direction:column;gap:.5rem;}
+.related-link{font-size:.8rem;color:var(--ink2);text-decoration:none;padding:.5rem 0;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.4rem;transition:color .15s;}
+.related-link:hover{color:var(--accent);}
+.related-link:last-child{border-bottom:none;}
+.toc{margin-bottom:1.2rem;}
+.toc-item{font-family:var(--mono);font-size:.65rem;letter-spacing:.06em;color:var(--ink3);padding:.3rem 0;border-bottom:1px solid var(--border);display:block;text-decoration:none;transition:color .15s;}
+.toc-item:hover{color:var(--accent);}
+footer{background:var(--ink);border-top:1px solid #1a1a18;padding:2rem 3rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;}
+.footer-logo{font-family:var(--serif);font-size:1.1rem;color:rgba(245,242,235,.3);}
+.footer-links{display:flex;gap:1.5rem;flex-wrap:wrap;}
+.footer-links a{font-family:var(--mono);font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(245,242,235,.2);text-decoration:none;transition:color .15s;}
+.footer-links a:hover{color:rgba(245,242,235,.55);}
+.footer-copy{font-family:var(--mono);font-size:.56rem;color:rgba(245,242,235,.15);text-transform:uppercase;}
+@media(max-width:860px){.article-wrap{grid-template-columns:1fr;gap:2rem;padding:3rem 1.4rem;}.sidebar-card{position:static;}}
+@media(max-width:720px){nav{padding:1rem 1.4rem;}.nav-links{display:none;}}
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">DiscoForge <span class="nav-dot"></span></a>
+  <div class="nav-links">
+    <a href="discoforge.html">Analyser</a>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="blog.html">← Blog</a>
+    <a href="contact.html">Contact</a>
+  </div>
+  <a href="discoforge.html" class="nav-cta">Essai gratuit →</a>
+</nav>
+<div class="article-wrap">
+  <article class="article-main">
+    <div class="article-kicker">Knowledge Graph · Entités</div>
+    <h1 class="article-h1"><em>Entities everywhere</em> : le Knowledge Graph, architecture invisible de Google</h1>
+    <div class="article-meta">
+      <span>Mars 2026</span>
+      <span>Nicolas Dayez</span>
+      <span>10 min de lecture</span>
+    </div>
+    <div class="article-body">
+      <p>Derrière chaque résultat de recherche Google, chaque carte d'information, chaque article recommandé dans Discover, se cache une infrastructure colossale : le Knowledge Graph. C'est la base de données qui permet à Google de comprendre le monde réel — non plus comme une collection de mots-clés, mais comme un réseau d'entités et de relations.</p>
+
+      <h2>Qu'est-ce qu'une entité Google ?</h2>
+      <p>Une entité est tout objet du monde réel clairement identifiable : une personne (Emmanuel Macron), une organisation (Le Monde), un lieu (Paris), un produit (iPhone 16), un concept (inflation). Chaque entité possède un identifiant unique dans le Knowledge Graph — le <strong>KG ID</strong> — et des attributs qui la décrivent.</p>
+      <p>Google a construit ce graphe à partir de Freebase (racheté en 2010), Wikidata, Wikipedia, et d'innombrables sources structurées. Il contient aujourd'hui plusieurs centaines de milliards de faits.</p>
+
+      <h2>Comment le Knowledge Graph influence Discover</h2>
+      <p>L'impact du Knowledge Graph sur Discover est direct et profond. Voici les mécanismes clés :</p>
+
+      <h3>Reconnaissance d'entités dans les titres</h3>
+      <p>Quand Google analyse votre titre, il y détecte des entités. Un titre comme "Google déploie Helpful Content 3.0" contient l'entité [Google] — organisation bien référencée dans le KG — et [Helpful Content] — concept documenté. Ce titre score mieux qu'un titre générique sans entité nommée.</p>
+
+      <h3>Graph embeddings et similarité sémantique</h3>
+      <p>Les graph embeddings sont des représentations mathématiques des entités et de leurs relations dans un espace vectoriel. Concrètement, cela permet à Google de calculer une distance sémantique entre votre article et les centres d'intérêt d'un utilisateur — sans même comparer les mots-clés.</p>
+      <p>Un utilisateur qui consomme du contenu sur [Électrification automobile] verra des articles sur [Batteries lithium], [Borne de recharge] ou [Tesla] — même si ces termes n'apparaissent pas dans ses recherches récentes.</p>
+
+      <h3>Autorité thématique via les entités</h3>
+      <p>Un site qui produit régulièrement du contenu autour d'un cluster d'entités cohérent développe une <strong>autorité thématique</strong> que Google peut quantifier. Cette autorité influence directement la fréquence de distribution dans Discover.</p>
+
+      <h2>Comment optimiser pour le Knowledge Graph</h2>
+      <ul>
+        <li><strong>Nommez les entités dans vos titres</strong> — préférez "Apple publie iOS 18.3" à "la grande mise à jour que tout le monde attendait"</li>
+        <li><strong>Utilisez les données structurées</strong> — schema.org/Article, Author, Organization permettent à Google d'associer clairement vos contenus à des entités KG</li>
+        <li><strong>Cohérence éditoriale</strong> — concentrez-vous sur un cluster thématique plutôt que de couvrir tous les sujets</li>
+        <li><strong>Profil d'auteur documenté</strong> — un auteur avec une page Wikipedia ou un Google Profile renforce les signaux E-E-A-T</li>
+        <li><strong>Liens entrants depuis des entités reconnues</strong> — les backlinks depuis des sites bien référencés dans le KG (grands médias, institutions) renforcent votre propre ancrage dans le graphe</li>
+      </ul>
+
+      <h2>Graph embeddings : l'avenir de la distribution de contenu</h2>
+      <p>Les graph embeddings représentent la prochaine frontière de l'optimisation Discover. Google peut désormais calculer, pour chaque paire (article, utilisateur), un score de pertinence sémantique basé sur la proximité dans l'espace vectoriel du Knowledge Graph.</p>
+      <p>Cela signifie que <strong>la stratégie de contenu doit être pensée en termes d'entités et de relations</strong>, pas seulement en termes de mots-clés. Un article qui connecte des entités pertinentes dans un cluster cohérent sera distribué à des utilisateurs qui n'ont jamais cherché ces termes mais dont le profil d'intérêt correspond au cluster.</p>
+
+      <div class="callout"><strong>En pratique :</strong> DiscoForge score la dimension "entity_density" de vos titres — le nombre et la qualité des entités Knowledge Graph détectées. C'est l'une des 8 dimensions pondérées dans le calcul du pCTR. <a href="discoforge.html">Testez votre titre →</a></div>
+    </div>
+  </article>
+
+  <aside class="article-sidebar">
+    <div class="sidebar-card">
+      <div class="sc-title">Optimisez vos titres</div>
+      <a href="discoforge.html" class="sc-cta">✦ Analyser gratuitement</a>
+      <div class="sc-note">5 analyses gratuites · Pas de carte bancaire · Résultat en 5 secondes</div>
+    </div>
+    <div class="sidebar-card">
+      <div class="sc-title">Articles liés</div>
+      <div class="related-links"><a href="blog-qu-est-ce-que-google-discover.html" class="related-link">→ Qu'est-ce que Google Discover ?</a><a href="blog-google-profile.html" class="related-link">→ Google Profile — le guide</a><a href="blog-gnewsalyzer.html" class="related-link">→ GnewsAlyzer — analyse</a></div>
+    </div>
+  </aside>
+</div>
+<footer>
+  <div class="footer-logo">DiscoForge</div>
+  <div class="footer-links">
+    <a href="mentions-legales.html">Mentions légales</a>
+    <a href="confidentialite.html">Confidentialité</a>
+    <a href="cgu.html">CGU</a>
+    <a href="contact.html">Contact</a>
+    <a href="a-propos.html">À propos</a>
+    <a href="blog.html">Blog</a>
+  </div>
+  <div class="footer-copy">© 2026 DiscoForge · Nicolas Dayez</div>
+</footer>
+</body></html>
