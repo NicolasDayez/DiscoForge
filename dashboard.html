@@ -6,698 +6,491 @@
 <title>DiscoForge — Dashboard Discover</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg: #0a0a0b;
-  --surface: #111113;
-  --surface2: #16161a;
-  --surface3: #1c1c22;
-  --border: #2a2a32;
-  --border2: #222228;
-  --accent: #e8ff47;
-  --accent2: #ff6b35;
-  --accent3: #7eb8ff;
-  --green: #4ade80;
-  --red: #ff4d6d;
-  --purple: #c084fc;
-  --text: #f0efe8;
-  --text-muted: #6b6b7a;
-  --text-dim: #3d3d48;
-  --mono: 'DM Mono', monospace;
-  --serif: 'DM Serif Display', serif;
-  --sans: 'DM Sans', sans-serif;
-}
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
-body { background: var(--bg); color: var(--text); font-family: var(--sans); font-weight: 300; min-height: 100vh; overflow-x: hidden; }
-body::before {
-  content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 9999;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
-  opacity: 0.5;
-}
+:root{--bg:#0a0a0b;--s1:#111113;--s2:#16161a;--s3:#1c1c22;--border:#2a2a32;--border2:#222228;--accent:#e8ff47;--a2:#ff6b35;--a3:#7eb8ff;--green:#4ade80;--red:#ff4d6d;--purple:#c084fc;--text:#f0efe8;--tm:#6b6b7a;--td:#3d3d48;--mono:'DM Mono',monospace;--serif:'DM Serif Display',serif;--sans:'DM Sans',sans-serif;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;overflow:hidden;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-weight:300;display:flex;flex-direction:column;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");opacity:.5;}
+nav{padding:1rem 1.8rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);flex-shrink:0;}
+.nav-logo{font-family:var(--serif);font-size:1.3rem;color:var(--text);text-decoration:none;display:flex;align-items:center;gap:.4rem;}
+.nav-dot{width:7px;height:7px;background:var(--accent);border-radius:50%;animation:pdot 2s ease-in-out infinite;}
+@keyframes pdot{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.5);opacity:.6}}
+.nav-right{display:flex;align-items:center;gap:.6rem;}
+.nav-btn{font-family:var(--mono);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;padding:.35rem .8rem;border-radius:3px;border:1px solid var(--border);background:transparent;color:var(--tm);cursor:pointer;transition:all .15s;text-decoration:none;display:inline-flex;align-items:center;gap:.4rem;}
+.nav-btn:hover{border-color:var(--accent);color:var(--accent);}
+.site-sel{font-family:var(--mono);font-size:.68rem;background:var(--s1);border:1px solid var(--border);color:var(--text);padding:.35rem .7rem;border-radius:3px;outline:none;cursor:pointer;}
+.conn-badge{display:inline-flex;align-items:center;gap:.4rem;font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;background:rgba(74,222,128,.08);color:var(--green);border:1px solid rgba(74,222,128,.2);padding:.22rem .6rem;border-radius:2rem;}
+.conn-dot{width:5px;height:5px;background:var(--green);border-radius:50%;animation:pdot 2s ease-in-out infinite;}
+.layout{display:grid;grid-template-columns:270px 1fr 320px;flex:1;overflow:hidden;}
 
-/* NAV */
-nav {
-  padding: 1.2rem 2.5rem; display: flex; align-items: center; justify-content: space-between;
-  border-bottom: 1px solid var(--border); background: rgba(10,10,11,0.95);
-  backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 100;
-}
-.nav-logo { font-family: var(--serif); font-size: 1.4rem; color: var(--text); text-decoration: none; display: flex; align-items: center; gap: 0.4rem; }
-.nav-dot { width: 7px; height: 7px; background: var(--accent); border-radius: 50%; animation: pulse 2s ease-in-out infinite; }
-@keyframes pulse { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.5);opacity:.6} }
-.nav-links { display: flex; align-items: center; gap: 0.5rem; }
-.nav-link { font-family: var(--mono); font-size: .65rem; letter-spacing: .1em; text-transform: uppercase; color: var(--text-muted); text-decoration: none; padding: .4rem .8rem; border-radius: 3px; transition: all .15s; }
-.nav-link:hover { color: var(--text); background: var(--surface2); }
-.nav-link.active { color: var(--accent); background: rgba(232,255,71,.06); }
-
-/* LAYOUT */
-.layout { display: grid; grid-template-columns: 220px 1fr; min-height: calc(100vh - 57px); }
-
-/* SIDEBAR */
-.sidebar { border-right: 1px solid var(--border); padding: 2rem 0; position: sticky; top: 57px; height: calc(100vh - 57px); overflow-y: auto; }
-.sidebar-section { margin-bottom: 2rem; }
-.sidebar-label { font-family: var(--mono); font-size: .58rem; letter-spacing: .16em; text-transform: uppercase; color: var(--text-dim); padding: 0 1.4rem; margin-bottom: .6rem; }
-.sidebar-item { display: flex; align-items: center; gap: .7rem; padding: .65rem 1.4rem; font-size: .82rem; color: var(--text-muted); cursor: pointer; transition: all .15s; border-left: 2px solid transparent; }
-.sidebar-item:hover { color: var(--text); background: var(--surface2); }
-.sidebar-item.active { color: var(--accent); border-left-color: var(--accent); background: rgba(232,255,71,.04); }
-.sidebar-icon { font-size: .9rem; width: 1.2rem; text-align: center; }
+/* CHAT */
+.chat-side{border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+.chat-hd{padding:.9rem 1.2rem;border-bottom:1px solid var(--border);flex-shrink:0;}
+.chat-hd-title{font-family:var(--mono);font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--tm);margin-bottom:.2rem;}
+.chat-hd-sub{font-size:.76rem;color:var(--td);}
+.chat-msgs{flex:1;overflow-y:auto;padding:.9rem;display:flex;flex-direction:column;gap:.7rem;}
+.chat-msgs::-webkit-scrollbar{width:3px;}
+.chat-msgs::-webkit-scrollbar-thumb{background:var(--border);}
+.msg{padding:.65rem .9rem;border-radius:4px;font-size:.79rem;line-height:1.65;animation:min .25s ease both;}
+@keyframes min{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.msg.user{background:rgba(232,255,71,.07);border:1px solid rgba(232,255,71,.12);align-self:flex-end;max-width:90%;}
+.msg.ai{background:var(--s2);border:1px solid var(--border);}
+.msg-lbl{font-family:var(--mono);font-size:.54rem;letter-spacing:.1em;text-transform:uppercase;color:var(--purple);margin-bottom:.3rem;}
+.msg-body{white-space:pre-wrap;}
+.msg-body strong{color:var(--accent);font-weight:500;}
+.msg-body em{color:var(--a3);font-style:normal;}
+.thinking-dot::after{content:'';display:inline-block;width:8px;height:8px;border:1.5px solid var(--purple);border-top-color:transparent;border-radius:50%;animation:spin .8s linear infinite;margin-left:.5rem;vertical-align:middle;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.chat-sugg{padding:.5rem .9rem;display:flex;flex-direction:column;gap:.3rem;border-top:1px solid var(--border);flex-shrink:0;}
+.sugg-lbl{font-family:var(--mono);font-size:.54rem;letter-spacing:.1em;text-transform:uppercase;color:var(--td);margin-bottom:.15rem;}
+.sugg{font-family:var(--mono);font-size:.57rem;letter-spacing:.05em;background:var(--s2);border:1px solid var(--border);color:var(--tm);padding:.28rem .55rem;border-radius:3px;cursor:pointer;transition:all .15s;text-align:left;}
+.sugg:hover{border-color:var(--purple);color:var(--purple);}
+.chat-inp-wrap{padding:.7rem .9rem;border-top:1px solid var(--border);display:flex;gap:.4rem;flex-shrink:0;}
+.chat-inp{flex:1;background:var(--s1);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:var(--sans);font-size:.78rem;padding:.55rem .8rem;outline:none;resize:none;height:56px;caret-color:var(--accent);transition:border-color .2s;}
+.chat-inp:focus{border-color:var(--purple);}
+.chat-inp::placeholder{color:var(--td);}
+.send-btn{background:var(--purple);border:none;color:#0a0a0b;width:34px;height:34px;border-radius:3px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;align-self:flex-end;transition:all .18s;}
+.send-btn:hover{background:#d8b4fe;}
+.send-btn:disabled{opacity:.3;cursor:not-allowed;}
 
 /* MAIN */
-.main { padding: 2.5rem; overflow-x: hidden; }
+.main{overflow-y:auto;padding:1.4rem;}
+.main::-webkit-scrollbar{width:3px;}
+.main::-webkit-scrollbar-thumb{background:var(--border);}
 
-/* IMPORT ZONE */
-.import-zone {
-  border: 1px dashed var(--border); border-radius: 6px; padding: 3rem 2rem;
-  text-align: center; cursor: pointer; transition: all .2s; position: relative;
-  background: var(--surface); margin-bottom: 2.5rem;
-}
-.import-zone:hover, .import-zone.dragover { border-color: var(--accent); background: rgba(232,255,71,.03); }
-.import-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
-.import-icon { font-size: 2.5rem; margin-bottom: 1rem; opacity: .4; }
-.import-title { font-family: var(--serif); font-size: 1.4rem; margin-bottom: .5rem; }
-.import-sub { font-size: .82rem; color: var(--text-muted); line-height: 1.7; margin-bottom: 1.5rem; }
-.import-steps { display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border); }
-.import-step { font-family: var(--mono); font-size: .65rem; letter-spacing: .08em; color: var(--text-dim); text-align: left; max-width: 160px; }
-.import-step span { display: block; color: var(--accent3); margin-bottom: .3rem; font-size: .6rem; letter-spacing: .12em; text-transform: uppercase; }
+/* Connect area */
+.connect-card{background:var(--s1);border:1px solid var(--border);border-radius:5px;padding:1.4rem;margin-bottom:1rem;}
+.connect-label{font-family:var(--mono);font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:var(--tm);margin-bottom:.8rem;}
+.gsc-btn{display:flex;align-items:center;gap:.7rem;background:var(--s2);border:1px solid var(--border);border-radius:4px;padding:.8rem 1.1rem;cursor:pointer;transition:all .18s;width:100%;text-align:left;}
+.gsc-btn:hover{border-color:var(--a3);background:rgba(126,184,255,.03);}
+.gsc-icon{font-size:1.1rem;flex-shrink:0;}
+.gsc-info{flex:1;}
+.gsc-title{font-size:.82rem;color:var(--text);margin-bottom:.15rem;}
+.gsc-sub{font-family:var(--mono);font-size:.58rem;color:var(--tm);}
+.gsc-arr{font-family:var(--mono);font-size:.72rem;color:var(--a3);}
+.import-zone{border:1px dashed var(--border);border-radius:5px;padding:2rem;text-align:center;cursor:pointer;transition:all .2s;position:relative;background:var(--s1);margin-bottom:1rem;}
+.import-zone:hover,.import-zone.dg{border-color:var(--accent);background:rgba(232,255,71,.02);}
+.import-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.import-icon{font-size:1.8rem;margin-bottom:.6rem;opacity:.4;}
+.import-title{font-family:var(--serif);font-size:1.2rem;margin-bottom:.3rem;}
+.import-sub{font-size:.78rem;color:var(--tm);line-height:1.65;}
 
-/* KPI CARDS */
-.kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; margin-bottom: 2rem; }
-.kpi-card { background: var(--surface); padding: 1.6rem; transition: background .2s; }
-.kpi-card:hover { background: var(--surface2); }
-.kpi-label { font-family: var(--mono); font-size: .6rem; letter-spacing: .14em; text-transform: uppercase; color: var(--text-muted); margin-bottom: .8rem; }
-.kpi-value { font-family: var(--serif); font-size: 2.4rem; font-weight: 400; line-height: 1; letter-spacing: -.03em; margin-bottom: .4rem; }
-.kpi-delta { font-family: var(--mono); font-size: .65rem; display: flex; align-items: center; gap: .3rem; }
-.kpi-delta.up { color: var(--green); }
-.kpi-delta.down { color: var(--red); }
-.kpi-delta.neutral { color: var(--text-muted); }
+/* KPIs */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:4px;overflow:hidden;margin-bottom:1.2rem;}
+.kpi{background:var(--s1);padding:1.1rem;transition:background .2s;}
+.kpi:hover{background:var(--s2);}
+.kpi-lbl{font-family:var(--mono);font-size:.56rem;letter-spacing:.12em;text-transform:uppercase;color:var(--tm);margin-bottom:.5rem;}
+.kpi-val{font-family:var(--serif);font-size:1.9rem;line-height:1;letter-spacing:-.03em;margin-bottom:.25rem;}
+.kpi-sub{font-family:var(--mono);font-size:.58rem;color:var(--td);}
 
-/* SECTION HEADERS */
-.section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.2rem; }
-.section-title { font-family: var(--mono); font-size: .65rem; letter-spacing: .14em; text-transform: uppercase; color: var(--text-muted); display: flex; align-items: center; gap: .6rem; }
-.section-title::before { content: ''; width: 1.5rem; height: 1px; background: var(--text-dim); }
-.section-actions { display: flex; gap: .5rem; }
-.btn-sm { font-family: var(--mono); font-size: .62rem; letter-spacing: .08em; text-transform: uppercase; padding: .35rem .8rem; border-radius: 3px; border: 1px solid var(--border); background: transparent; color: var(--text-muted); cursor: pointer; transition: all .15s; }
-.btn-sm:hover { border-color: var(--accent); color: var(--accent); }
-.btn-sm.active { border-color: var(--accent); color: var(--accent); background: rgba(232,255,71,.06); }
+/* Sections */
+.sec-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:.7rem;}
+.sec-lbl{font-family:var(--mono);font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:var(--tm);display:flex;align-items:center;gap:.5rem;}
+.sec-lbl::before{content:'';width:1rem;height:1px;background:var(--td);}
+.bx{font-family:var(--mono);font-size:.57rem;letter-spacing:.08em;text-transform:uppercase;background:transparent;border:1px solid var(--border);color:var(--tm);padding:.22rem .55rem;border-radius:3px;cursor:pointer;transition:all .15s;}
+.bx:hover{border-color:var(--accent);color:var(--accent);}
+.bx.on{border-color:var(--accent);color:var(--accent);background:rgba(232,255,71,.05);}
 
-/* TABLE */
-.table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; margin-bottom: 2rem; }
-.table-search { padding: .8rem 1.2rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: .6rem; }
-.table-search input { background: none; border: none; color: var(--text); font-family: var(--mono); font-size: .75rem; outline: none; flex: 1; caret-color: var(--accent); }
-.table-search input::placeholder { color: var(--text-dim); }
-.search-icon { color: var(--text-dim); font-size: .8rem; }
-table { width: 100%; border-collapse: collapse; }
-th { font-family: var(--mono); font-size: .6rem; letter-spacing: .12em; text-transform: uppercase; color: var(--text-dim); padding: .8rem 1.2rem; text-align: left; border-bottom: 1px solid var(--border); font-weight: 400; white-space: nowrap; cursor: pointer; user-select: none; }
-th:hover { color: var(--text-muted); }
-th.sorted { color: var(--accent); }
-th .sort-arrow { margin-left: .3rem; opacity: .5; }
-th.sorted .sort-arrow { opacity: 1; }
-td { padding: .9rem 1.2rem; border-bottom: 1px solid var(--border2); font-size: .8rem; vertical-align: middle; }
-tr:last-child td { border-bottom: none; }
-tr:hover td { background: var(--surface2); }
-.td-url { font-family: var(--mono); font-size: .7rem; color: var(--text-muted); max-width: 320px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.td-url a { color: var(--accent3); text-decoration: none; }
-.td-url a:hover { text-decoration: underline; }
-.td-num { font-family: var(--mono); font-size: .75rem; text-align: right; }
-.td-ctr { font-family: var(--mono); font-size: .75rem; text-align: right; }
-.ctr-bar { display: flex; align-items: center; gap: .5rem; justify-content: flex-end; }
-.ctr-pill { height: 4px; border-radius: 2px; background: var(--accent); min-width: 2px; }
-.td-pos { font-family: var(--mono); font-size: .75rem; text-align: right; }
-.pos-badge { display: inline-flex; align-items: center; justify-content: center; width: 2.2rem; height: 1.4rem; border-radius: 3px; font-size: .68rem; }
-.pos-top { background: rgba(74,222,128,.1); color: var(--green); }
-.pos-mid { background: rgba(232,255,71,.08); color: var(--accent); }
-.pos-low { background: rgba(255,107,53,.1); color: var(--accent2); }
+/* Chart */
+.chart-wrap{background:var(--s1);border:1px solid var(--border);border-radius:4px;padding:1.1rem;margin-bottom:1.2rem;}
+.chart-area{height:130px;margin-top:.7rem;}
+svg.chart{width:100%;height:100%;overflow:visible;}
 
-/* CHART */
-.chart-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 1.5rem; margin-bottom: 2rem; }
-.chart-area { position: relative; height: 180px; margin-top: 1rem; }
-.chart-svg { width: 100%; height: 100%; overflow: visible; }
+/* Table */
+.tbl-wrap{background:var(--s1);border:1px solid var(--border);border-radius:4px;overflow:hidden;margin-bottom:1.2rem;}
+.tbl-top{padding:.55rem 1rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.5rem;}
+.tbl-search{flex:1;background:none;border:none;color:var(--text);font-family:var(--mono);font-size:.7rem;outline:none;caret-color:var(--accent);}
+.tbl-search::placeholder{color:var(--td);}
+table{width:100%;border-collapse:collapse;}
+th{font-family:var(--mono);font-size:.54rem;letter-spacing:.12em;text-transform:uppercase;color:var(--td);padding:.6rem 1rem;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;cursor:pointer;user-select:none;}
+th:hover{color:var(--tm);}
+td{padding:.7rem 1rem;border-bottom:1px solid var(--border2);font-size:.77rem;vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:var(--s2);}
+.td-url{font-family:var(--mono);font-size:.64rem;color:var(--tm);max-width:250px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.td-url a{color:var(--a3);text-decoration:none;}
+.td-url a:hover{text-decoration:underline;}
+.td-n{font-family:var(--mono);font-size:.68rem;text-align:right;}
+.bar-cell{display:flex;align-items:center;gap:.4rem;justify-content:flex-end;}
+.bar{height:3px;border-radius:2px;}
+.pos-pill{font-family:var(--mono);font-size:.6rem;padding:.13rem .42rem;border-radius:3px;}
+.pa{background:rgba(74,222,128,.1);color:var(--green);}
+.pb{background:rgba(232,255,71,.08);color:var(--accent);}
+.pc{background:rgba(255,107,53,.1);color:var(--a2);}
+.ab{font-family:var(--mono);font-size:.56rem;letter-spacing:.08em;text-transform:uppercase;background:var(--accent);color:#0a0a0b;border:none;padding:.2rem .5rem;border-radius:2px;cursor:pointer;transition:all .15s;}
+.ab:hover{background:#f5ff7a;}
+.pag{display:flex;align-items:center;justify-content:space-between;padding:.55rem 1rem;border-top:1px solid var(--border);font-family:var(--mono);font-size:.6rem;color:var(--td);}
+.pg-btns{display:flex;gap:.3rem;}
+.pg{background:none;border:1px solid var(--border);color:var(--tm);padding:.2rem .48rem;border-radius:3px;cursor:pointer;font-family:var(--mono);font-size:.58rem;transition:all .15s;}
+.pg:hover{border-color:var(--accent);color:var(--accent);}
+.pg:disabled{opacity:.25;cursor:not-allowed;}
 
-/* EMPTY STATE */
-.empty-state { text-align: center; padding: 4rem 2rem; color: var(--text-muted); }
-.empty-icon { font-size: 3rem; margin-bottom: 1rem; opacity: .3; }
-.empty-title { font-family: var(--serif); font-size: 1.4rem; margin-bottom: .5rem; color: var(--text); }
-.empty-sub { font-size: .82rem; line-height: 1.7; max-width: 320px; margin: 0 auto; }
+/* Right panel */
+.right-panel{border-left:1px solid var(--border);overflow-y:auto;display:flex;flex-direction:column;}
+.right-panel::-webkit-scrollbar{width:3px;}
+.right-panel::-webkit-scrollbar-thumb{background:var(--border);}
+.rp-sec{padding:.9rem 1.1rem;border-bottom:1px solid var(--border);}
+.rp-title{font-family:var(--mono);font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:var(--tm);margin-bottom:.8rem;}
+.opp{background:var(--s2);border:1px solid var(--border);border-radius:4px;padding:.8rem;margin-bottom:.5rem;cursor:pointer;transition:all .15s;}
+.opp:hover{border-color:var(--accent);background:rgba(232,255,71,.03);}
+.opp:last-child{margin-bottom:0;}
+.opp-tag{font-family:var(--mono);font-size:.53rem;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.35rem;}
+.opp-title{font-size:.78rem;line-height:1.5;margin-bottom:.25rem;}
+.opp-meta{font-family:var(--mono);font-size:.58rem;color:var(--td);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.opp-action{font-family:var(--mono);font-size:.58rem;color:var(--a3);margin-top:.25rem;}
+.ot-urgent{color:var(--accent);}
+.ot-improve{color:var(--a3);}
+.ot-win{color:var(--green);}
+.empty-rp{text-align:center;padding:2rem 1rem;color:var(--tm);}
+.empty-rp .ei{font-size:1.8rem;opacity:.3;margin-bottom:.6rem;}
+.empty-rp .et{font-family:var(--serif);font-size:1.1rem;margin-bottom:.3rem;color:var(--text);}
+.empty-rp .es{font-size:.76rem;line-height:1.65;}
 
-/* BADGE */
-.badge { font-family: var(--mono); font-size: .58rem; letter-spacing: .1em; text-transform: uppercase; padding: .18rem .5rem; border-radius: 2rem; }
-.badge-green { background: rgba(74,222,128,.1); color: var(--green); border: 1px solid rgba(74,222,128,.2); }
-.badge-yellow { background: rgba(232,255,71,.08); color: var(--accent); border: 1px solid rgba(232,255,71,.18); }
-.badge-red { background: rgba(255,77,109,.08); color: var(--red); border: 1px solid rgba(255,77,109,.18); }
-
-/* FILTER BAR */
-.filter-bar { display: flex; gap: .6rem; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; }
-.filter-label { font-family: var(--mono); font-size: .62rem; letter-spacing: .1em; text-transform: uppercase; color: var(--text-dim); }
-
-/* PAGINATION */
-.pagination { display: flex; align-items: center; justify-content: space-between; padding: .8rem 1.2rem; border-top: 1px solid var(--border); font-family: var(--mono); font-size: .65rem; color: var(--text-muted); }
-.page-btns { display: flex; gap: .4rem; }
-.page-btn { background: none; border: 1px solid var(--border); color: var(--text-muted); padding: .3rem .6rem; border-radius: 3px; cursor: pointer; font-family: var(--mono); font-size: .62rem; transition: all .15s; }
-.page-btn:hover { border-color: var(--accent); color: var(--accent); }
-.page-btn:disabled { opacity: .3; cursor: not-allowed; }
-
-/* ANALYZE BTN */
-.analyze-cta { background: var(--accent); color: #0a0a0b; border: none; padding: .5rem 1.2rem; font-family: var(--mono); font-size: .65rem; letter-spacing: .1em; text-transform: uppercase; font-weight: 500; cursor: pointer; border-radius: 3px; transition: all .18s; text-decoration: none; display: inline-flex; align-items: center; gap: .4rem; }
-.analyze-cta:hover { background: #f5ff7a; }
-
-/* EXPORT BTN */
-.export-btn { background: none; border: 1px solid var(--border); color: var(--text-muted); padding: .4rem .9rem; font-family: var(--mono); font-size: .62rem; letter-spacing: .08em; text-transform: uppercase; cursor: pointer; border-radius: 3px; transition: all .15s; }
-.export-btn:hover { border-color: var(--accent3); color: var(--accent3); }
-
-@media (max-width: 768px) {
-  .layout { grid-template-columns: 1fr; }
-  .sidebar { display: none; }
-  .main { padding: 1.5rem; }
-}
+@media(max-width:1100px){.layout{grid-template-columns:240px 1fr}.right-panel{display:none;}}
+@media(max-width:768px){.layout{grid-template-columns:1fr}.chat-side{display:none;}}
 </style>
 </head>
 <body>
 
 <nav>
   <a href="index.html" class="nav-logo">DiscoForge <span class="nav-dot"></span></a>
-  <div class="nav-links">
-    <a href="discoforge.html" class="nav-link">✦ Analyser</a>
-    <a href="dashboard.html" class="nav-link active">◈ Dashboard</a>
-    <a href="index.html" class="nav-link">Tarifs</a>
+  <div class="nav-right">
+    <span id="connBadge" style="display:none" class="conn-badge"><span class="conn-dot"></span> GSC connecté</span>
+    <select class="site-sel" id="siteSel" style="display:none" onchange="onSiteChange()"><option value="">Choisir un site…</option></select>
+    <a href="discoforge.html" class="nav-btn">✦ Analyser</a>
+    <button class="nav-btn" id="discBtn" style="display:none" onclick="disconnectGoogle()">Déconnecter</button>
   </div>
 </nav>
 
 <div class="layout">
 
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <div class="sidebar-section">
-      <div class="sidebar-label">Vues</div>
-      <div class="sidebar-item active" onclick="showView('overview')">
-        <span class="sidebar-icon">◈</span> Vue d'ensemble
+<!-- ══ CHAT ══ -->
+<aside class="chat-side">
+  <div class="chat-hd">
+    <div class="chat-hd-title">◈ Assistant Discover IA</div>
+    <div class="chat-hd-sub">Analysez vos données en temps réel</div>
+  </div>
+  <div class="chat-msgs" id="chatMsgs">
+    <div class="msg ai">
+      <div class="msg-lbl">DiscoForge AI</div>
+      <div class="msg-body">Bonjour ! Je suis votre analyste Discover IA.
+
+Connectez votre Search Console ou importez un CSV, puis posez-moi n'importe quelle question sur vos performances Discover.</div>
+    </div>
+  </div>
+  <div class="chat-sugg">
+    <div class="sugg-lbl">Questions rapides</div>
+    <button class="sugg" onclick="ask(this.textContent)">📈 Quels articles ont le meilleur potentiel ?</button>
+    <button class="sugg" onclick="ask(this.textContent)">🎯 Où mon CTR est-il le plus faible ?</button>
+    <button class="sugg" onclick="ask(this.textContent)">🔍 Quelles opportunités dois-je prioriser ?</button>
+    <button class="sugg" onclick="ask(this.textContent)">⚡ Comment grimper plus vite dans Discover ?</button>
+  </div>
+  <div class="chat-inp-wrap">
+    <textarea class="chat-inp" id="chatInp" placeholder="Posez votre question…" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat();}"></textarea>
+    <button class="send-btn" id="sendBtn" onclick="sendChat()">
+      <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M12.5 7L1.5 2l2.5 5-2.5 5z" fill="currentColor"/></svg>
+    </button>
+  </div>
+</aside>
+
+<!-- ══ MAIN ══ -->
+<main class="main">
+
+  <div id="connectArea">
+    <div class="connect-card">
+      <div class="connect-label">Connexion Search Console</div>
+      <button class="gsc-btn" onclick="connectGoogle()">
+        <span class="gsc-icon">🔗</span>
+        <span class="gsc-info">
+          <div class="gsc-title">Connecter Google Search Console</div>
+          <div class="gsc-sub">OAuth sécurisé · Données Discover en temps réel · 90 derniers jours</div>
+        </span>
+        <span class="gsc-arr">→</span>
+      </button>
+    </div>
+    <div class="import-zone" id="impZone">
+      <input type="file" id="csvIn" accept=".csv,.tsv" onchange="handleFile(this.files[0])">
+      <div class="import-icon">📊</div>
+      <div class="import-title">Ou importez un CSV</div>
+      <div class="import-sub">Search Console → Discover → Exporter → CSV<br>Glissez-déposez le fichier ici</div>
+    </div>
+  </div>
+
+  <div id="dashContent" style="display:none">
+    <div class="kpi-grid" id="kpiGrid"></div>
+    <div class="chart-wrap">
+      <div class="sec-hd">
+        <div class="sec-lbl">Évolution</div>
+        <div style="display:flex;gap:.3rem;">
+          <button class="bx on" onclick="setMetric('clicks',this)">Clics</button>
+          <button class="bx" onclick="setMetric('impressions',this)">Impressions</button>
+          <button class="bx" onclick="setMetric('ctr',this)">CTR</button>
+        </div>
       </div>
-      <div class="sidebar-item" onclick="showView('articles')">
-        <span class="sidebar-icon">✦</span> Articles
+      <div class="chart-area"><svg class="chart" id="chartSvg" viewBox="0 0 700 130" preserveAspectRatio="none"></svg></div>
+    </div>
+    <div class="sec-hd">
+      <div class="sec-lbl">Articles</div>
+      <button class="bx" onclick="exportCSV()">↓ Export</button>
+    </div>
+    <div class="tbl-wrap">
+      <div class="tbl-top">
+        <span style="color:var(--td);font-size:.8rem;">⌕</span>
+        <input class="tbl-search" id="searchInp" placeholder="Rechercher…" oninput="filterTable()">
       </div>
-      <div class="sidebar-item" onclick="showView('images')">
-        <span class="sidebar-icon">🖼</span> Images og
+      <table>
+        <thead><tr>
+          <th onclick="srt('url')">Article</th>
+          <th onclick="srt('clicks')" style="text-align:right">Clics</th>
+          <th onclick="srt('impressions')" style="text-align:right">Impr.</th>
+          <th onclick="srt('ctr')" style="text-align:right">CTR</th>
+          <th onclick="srt('position')" style="text-align:right">Pos.</th>
+          <th></th>
+        </tr></thead>
+        <tbody id="tblBody"></tbody>
+      </table>
+      <div class="pag">
+        <span id="pagInfo">—</span>
+        <div class="pg-btns">
+          <button class="pg" id="pgP" onclick="chPage(-1)">←</button>
+          <button class="pg" id="pgN" onclick="chPage(1)">→</button>
+        </div>
       </div>
     </div>
-    <div class="sidebar-section">
-      <div class="sidebar-label">Actions</div>
-      <div class="sidebar-item" onclick="document.getElementById('csvInput').click()">
-        <span class="sidebar-icon">↑</span> Importer CSV
-      </div>
-      <div class="sidebar-item" onclick="exportData()">
-        <span class="sidebar-icon">↓</span> Exporter
-      </div>
-      <div class="sidebar-item" onclick="clearData()">
-        <span class="sidebar-icon">✕</span> Réinitialiser
-      </div>
+  </div>
+
+</main>
+
+<!-- ══ RIGHT PANEL ══ -->
+<aside class="right-panel">
+  <div class="rp-sec">
+    <div class="rp-title">⚡ Opportunités détectées</div>
+    <div id="oppList">
+      <div class="empty-rp"><div class="ei">◈</div><div class="et">En attente</div><div class="es">Connectez la Search Console ou importez un CSV.</div></div>
     </div>
-    <div class="sidebar-section" id="sidebar-stats" style="display:none">
-      <div class="sidebar-label">Fichier chargé</div>
-      <div style="padding:0 1.4rem;font-family:var(--mono);font-size:.65rem;color:var(--text-muted);line-height:1.9;">
-        <div id="stat-rows">— lignes</div>
-        <div id="stat-period">—</div>
-        <div id="stat-loaded" style="color:var(--accent)">—</div>
-      </div>
-    </div>
-  </aside>
+  </div>
+</aside>
 
-  <!-- MAIN -->
-  <main class="main">
-
-    <!-- IMPORT ZONE -->
-    <div class="import-zone" id="importZone">
-      <input type="file" id="csvInput" accept=".csv,.tsv" onchange="handleFile(this.files[0])">
-      <div class="import-icon">◈</div>
-      <div class="import-title">Importer vos données Discover</div>
-      <div class="import-sub">Déposez votre export CSV de la Google Search Console<br>ou cliquez pour parcourir</div>
-      <div class="import-steps">
-        <div class="import-step">
-          <span>Étape 1</span>
-          Ouvrir Search Console → Discover
-        </div>
-        <div class="import-step">
-          <span>Étape 2</span>
-          Cliquer "Exporter" → Télécharger CSV
-        </div>
-        <div class="import-step">
-          <span>Étape 3</span>
-          Déposer le fichier ici
-        </div>
-      </div>
-    </div>
-
-    <!-- DASHBOARD CONTENT (hidden until data loaded) -->
-    <div id="dashboardContent" style="display:none">
-
-      <!-- KPI ROW -->
-      <div class="kpi-grid" id="kpiGrid"></div>
-
-      <!-- CHART -->
-      <div class="chart-wrap" id="chartWrap">
-        <div class="section-header">
-          <div class="section-title">Évolution dans le temps</div>
-          <div class="section-actions">
-            <button class="btn-sm active" onclick="setMetric('clicks',this)">Clics</button>
-            <button class="btn-sm" onclick="setMetric('impressions',this)">Impressions</button>
-            <button class="btn-sm" onclick="setMetric('ctr',this)">CTR</button>
-          </div>
-        </div>
-        <div class="chart-area">
-          <svg class="chart-svg" id="chartSvg" viewBox="0 0 800 180" preserveAspectRatio="none"></svg>
-        </div>
-      </div>
-
-      <!-- ARTICLES TABLE -->
-      <div id="viewOverview">
-        <div class="section-header">
-          <div class="section-title">Performance par article</div>
-          <div style="display:flex;gap:.5rem;align-items:center;">
-            <button class="export-btn" onclick="exportData()">↓ Export CSV</button>
-          </div>
-        </div>
-
-        <div class="filter-bar">
-          <span class="filter-label">Trier par :</span>
-          <button class="btn-sm active" onclick="sortBy('clicks',this)">Clics ↓</button>
-          <button class="btn-sm" onclick="sortBy('impressions',this)">Impressions</button>
-          <button class="btn-sm" onclick="sortBy('ctr',this)">CTR</button>
-          <button class="btn-sm" onclick="sortBy('position',this)">Position</button>
-        </div>
-
-        <div class="table-wrap">
-          <div class="table-search">
-            <span class="search-icon">⌕</span>
-            <input type="text" id="searchInput" placeholder="Rechercher une URL ou un titre…" oninput="filterTable()">
-          </div>
-          <table>
-            <thead>
-              <tr>
-                <th style="width:40%">Article</th>
-                <th class="td-num" style="cursor:pointer" onclick="sortBy('clicks',null)">Clics</th>
-                <th class="td-num" onclick="sortBy('impressions',null)">Impressions</th>
-                <th class="td-ctr" onclick="sortBy('ctr',null)">CTR</th>
-                <th class="td-pos" onclick="sortBy('position',null)">Position</th>
-                <th style="width:100px"></th>
-              </tr>
-            </thead>
-            <tbody id="tableBody"></tbody>
-          </table>
-          <div class="pagination">
-            <div id="paginationInfo">— articles</div>
-            <div class="page-btns">
-              <button class="page-btn" id="prevBtn" onclick="changePage(-1)">←</button>
-              <button class="page-btn" id="nextBtn" onclick="changePage(1)">→</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- EMPTY STATE (shown when no data) -->
-    <div id="emptyState" style="display:none">
-      <div class="empty-state">
-        <div class="empty-icon">◈</div>
-        <div class="empty-title">Aucune donnée Discover</div>
-        <div class="empty-sub">Importez votre export CSV depuis la Google Search Console pour visualiser vos performances.</div>
-      </div>
-    </div>
-
-  </main>
 </div>
 
 <script>
+/* STATE */
+let allData=[],filtData=[],sk='clicks',sd=-1,metric='clicks',page=0,gscTok=null;
+const PAGE=15;
 
 /* ACCESS GATE */
-const VALID_CODES_CLIENT = ['pro', 'enterprise', 'beta']; // plans with dashboard access
+const DASH_PLANS=['pro','enterprise','beta'];
+function checkAccess(){
+  const plan=localStorage.getItem('df_plan'),tok=localStorage.getItem('df_token');
+  if(plan&&DASH_PLANS.includes(plan)&&tok){try{const ts=parseInt(atob(tok).split(':')[1]);if(Date.now()-ts<30*864e5)return true;}catch(e){}}
+  showGate();return false;
+}
+function showGate(){
+  document.body.innerHTML=`<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--bg);font-family:var(--sans);"><div style="background:var(--s1);border:1px solid var(--border);border-radius:6px;padding:3rem;max-width:420px;width:100%;text-align:center;"><div style="font-size:2.5rem;margin-bottom:1.2rem;">🔒</div><div style="font-family:var(--serif);font-size:1.6rem;margin-bottom:.6rem;">Accès Pro requis</div><div style="font-size:.85rem;color:var(--tm);line-height:1.75;margin-bottom:2rem;">Le Dashboard est réservé aux plans Pro et Enterprise.</div><input id="gi" type="text" placeholder="Votre code d'accès" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:var(--mono);font-size:.82rem;letter-spacing:.1em;text-transform:uppercase;padding:.9rem 1rem;outline:none;caret-color:var(--accent);margin-bottom:.8rem;text-align:center;" oninput="tryGate(this.value)"><div id="gm" style="font-family:var(--mono);font-size:.65rem;margin-bottom:1.5rem;min-height:1rem;color:var(--tm);"></div><a href="index.html#pricing" style="display:block;font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--tm);text-decoration:none;border:1px solid var(--border);padding:.6rem;border-radius:3px;">Voir les offres →</a></div></div>`;
+}
+async function tryGate(v){
+  const code=v.trim();if(code.length<4)return;
+  const m=document.getElementById('gm');m.textContent='Vérification…';
+  try{
+    const r=await fetch('/api/verify-code',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code})});
+    const d=await r.json();
+    if(d.valid&&DASH_PLANS.includes(d.plan)){
+      localStorage.setItem('df_token',btoa(code+':'+Date.now()));
+      localStorage.setItem('df_plan',d.plan);localStorage.setItem('df_features',JSON.stringify(d.features));
+      m.style.color='#4ade80';m.textContent='✓ Accès validé — chargement…';
+      setTimeout(()=>location.reload(),800);
+    }else if(d.valid){m.style.color='#ff6b35';m.textContent='✗ Plan insuffisant';}
+    else{m.style.color='#ff4d6d';m.textContent='✗ Code invalide';}
+  }catch(e){m.textContent='⚠ Erreur réseau';}
+}
 
-function checkDashboardAccess() {
-  const saved = localStorage.getItem('df_code');
-  const savedPlan = localStorage.getItem('df_plan');
-  if (savedPlan && VALID_CODES_CLIENT.includes(savedPlan)) return true;
-
-  // Show gate overlay
-  document.body.innerHTML = `
-    <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--bg);font-family:var(--sans);">
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:3rem;max-width:420px;width:100%;text-align:center;">
-        <div style="font-size:2rem;margin-bottom:1.2rem;">🔒</div>
-        <div style="font-family:var(--serif);font-size:1.6rem;margin-bottom:.6rem;">Accès Pro requis</div>
-        <div style="font-size:.85rem;color:var(--text-muted);line-height:1.7;margin-bottom:2rem;">
-          Le Dashboard Discover est réservé aux plans Pro et Enterprise.
-        </div>
-        <input id="gateIn" type="text" placeholder="Votre code d'accès (ex: DISCO-PRO)"
-          style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:4px;
-          color:var(--text);font-family:var(--mono);font-size:.82rem;letter-spacing:.12em;
-          text-transform:uppercase;padding:.9rem 1rem;outline:none;caret-color:var(--accent);
-          margin-bottom:.8rem;"
-          oninput="tryUnlock(this.value)">
-        <div id="gateMsg" style="font-family:var(--mono);font-size:.65rem;margin-bottom:1.5rem;min-height:1rem;"></div>
-        <a href="index.html#pricing" style="display:block;font-family:var(--mono);font-size:.72rem;
-          letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);text-decoration:none;
-          border:1px solid var(--border);padding:.6rem;border-radius:3px;">
-          Voir les offres →
-        </a>
-      </div>
-    </div>
-  `;
+/* GOOGLE OAUTH */
+async function connectGoogle(){
+  try{
+    const r=await fetch('/api/google-auth',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'client_id'})});
+    const d=await r.json();
+    if(!d.client_id){alert('OAuth non configuré. Contactez l\'administrateur.');return;}
+    const p=new URLSearchParams({client_id:d.client_id,redirect_uri:location.origin+'/dashboard.html',response_type:'code',scope:'https://www.googleapis.com/auth/webmasters.readonly',access_type:'offline',prompt:'consent',state:'gsc_auth'});
+    location.href='https://accounts.google.com/o/oauth2/v2/auth?'+p.toString();
+  }catch(e){alert('Erreur de connexion.');}
+}
+async function handleOAuth(){
+  const p=new URLSearchParams(location.search);
+  const code=p.get('code'),state=p.get('state');
+  if(!code||state!=='gsc_auth')return false;
+  history.replaceState({},'',location.pathname);
+  try{
+    const r=await fetch('/api/google-auth',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'exchange',code})});
+    const d=await r.json();
+    if(d.access_token){gscTok=d.access_token;sessionStorage.setItem('gsc_tok',gscTok);await loadSites();return true;}
+  }catch(e){}
   return false;
 }
-
-async function tryUnlock(val) {
-  const code = val.trim();
-  if (code.length < 4) return;
-  const msg = document.getElementById('gateMsg');
-  msg.style.color = 'var(--text-muted)'; msg.textContent = 'Vérification…';
-  try {
-    const resp = await fetch('/api/verify-code', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ code })
-    });
-    const data = await resp.json();
-    if (data.valid && ['pro','enterprise','beta'].includes(data.plan)) {
-      localStorage.setItem('df_token', btoa(code + ':' + Date.now()));
-      localStorage.setItem('df_plan', data.plan);
-      localStorage.setItem('df_features', JSON.stringify(data.features));
-      msg.style.color = '#4ade80'; msg.textContent = '✓ Accès validé — chargement…';
-      setTimeout(() => location.reload(), 800);
-    } else if (data.valid) {
-      msg.style.color = '#ff6b35'; msg.textContent = '✗ Plan insuffisant — Pro ou Enterprise requis';
-    } else {
-      msg.style.color = '#ff4d6d'; msg.textContent = '✗ Code invalide';
-    }
-  } catch(e) { msg.style.color = '#ff4d6d'; msg.textContent = '⚠ Erreur réseau'; }
+async function loadSites(){
+  const r=await fetch('/api/google-auth',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'sites',access_token:gscTok})});
+  const d=await r.json();if(!d.sites)return;
+  const sel=document.getElementById('siteSel');
+  sel.innerHTML='<option value="">Choisir un site…</option>';
+  d.sites.forEach(s=>{const o=document.createElement('option');o.value=s.siteUrl;o.textContent=s.siteUrl.replace('sc-domain:','').replace('https://','');sel.appendChild(o);});
+  sel.style.display='block';document.getElementById('connBadge').style.display='inline-flex';document.getElementById('discBtn').style.display='block';
+  if(d.sites.length===1){sel.value=d.sites[0].siteUrl;await loadDiscover(d.sites[0].siteUrl);}
 }
-
-if (!checkDashboardAccess()) { /* blocked */ }
-else {
-
-/* ═══════════════════════════
-   STATE
-═══════════════════════════ */
-let allData = [];
-let filteredData = [];
-let currentSort = { key: 'clicks', dir: -1 };
-let currentMetric = 'clicks';
-let currentPage = 0;
-const PAGE_SIZE = 15;
-
-/* ═══════════════════════════
-   FILE HANDLING
-═══════════════════════════ */
-const importZone = document.getElementById('importZone');
-importZone.addEventListener('dragover', e => { e.preventDefault(); importZone.classList.add('dragover'); });
-importZone.addEventListener('dragleave', () => importZone.classList.remove('dragover'));
-importZone.addEventListener('drop', e => {
-  e.preventDefault(); importZone.classList.remove('dragover');
-  const f = e.dataTransfer.files[0];
-  if (f) handleFile(f);
-});
-
-function handleFile(file) {
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => parseCSV(e.target.result, file.name);
-  reader.readAsText(file, 'UTF-8');
+async function onSiteChange(){const v=document.getElementById('siteSel').value;if(v&&gscTok)await loadDiscover(v);}
+async function loadDiscover(site){
+  document.getElementById('connectArea').style.display='none';
+  document.getElementById('dashContent').style.display='block';
+  document.getElementById('kpiGrid').innerHTML='<div style="padding:1.5rem;font-family:var(--mono);font-size:.68rem;color:var(--tm);grid-column:1/-1">Chargement…</div>';
+  try{
+    const r=await fetch('/api/google-auth',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'discover',access_token:gscTok,site_url:site})});
+    const d=await r.json();
+    if(d.rows){allData=d.rows;filtData=[...allData];renderAll();addMsg('ai',`✓ **${allData.length} articles Discover** chargés.\n\n**${detectOpps(allData).length} opportunités** détectées. Posez-moi vos questions !`);}
+  }catch(e){document.getElementById('kpiGrid').innerHTML='<div style="padding:1.5rem;color:var(--red);font-family:var(--mono);font-size:.68rem;">Erreur de chargement.</div>';}
 }
+function disconnectGoogle(){gscTok=null;sessionStorage.removeItem('gsc_tok');document.getElementById('connBadge').style.display='none';document.getElementById('siteSel').style.display='none';document.getElementById('discBtn').style.display='none';document.getElementById('connectArea').style.display='block';document.getElementById('dashContent').style.display='none';allData=[];filtData=[];}
 
-function parseCSV(text, filename) {
-  const lines = text.trim().split('\n');
-  if (lines.length < 2) { alert('Fichier CSV vide ou invalide.'); return; }
-
-  // Detect separator
-  const sep = lines[0].includes('\t') ? '\t' : ',';
-  const headers = lines[0].split(sep).map(h => h.trim().replace(/"/g, '').toLowerCase());
-
-  // Find column indices — handles Google Search Console CSV formats
-  const findCol = (...names) => {
-    for (const n of names) {
-      const i = headers.findIndex(h => h.includes(n));
-      if (i >= 0) return i;
-    }
-    return -1;
-  };
-
-  const urlCol   = findCol('page', 'url', 'top pages');
-  const clkCol   = findCol('click', 'clics');
-  const impCol   = findCol('impression', 'impress');
-  const ctrCol   = findCol('ctr');
-  const posCol   = findCol('position', 'pos');
-
-  if (urlCol < 0 || clkCol < 0) {
-    alert('Format CSV non reconnu. Assurez-vous d\'exporter depuis Search Console → Discover → Exporter.');
-    return;
+/* CSV */
+const iz=document.getElementById('impZone');
+iz.addEventListener('dragover',e=>{e.preventDefault();iz.classList.add('dg');});
+iz.addEventListener('dragleave',()=>iz.classList.remove('dg'));
+iz.addEventListener('drop',e=>{e.preventDefault();iz.classList.remove('dg');if(e.dataTransfer.files[0])handleFile(e.dataTransfer.files[0]);});
+function handleFile(f){const r=new FileReader();r.onload=e=>parseCSV(e.target.result);r.readAsText(f,'UTF-8');}
+function parseCSV(txt){
+  const lines=txt.trim().split('\n');if(lines.length<2)return;
+  const sep=lines[0].includes('\t')?'\t':',';
+  const hdrs=lines[0].split(sep).map(h=>h.trim().replace(/"/g,'').toLowerCase());
+  const fi=(...ns)=>{for(const n of ns){const i=hdrs.findIndex(h=>h.includes(n));if(i>=0)return i;}return -1;};
+  const uc=fi('page','url'),cc=fi('click','clic'),ic=fi('impress'),tc=fi('ctr'),pc=fi('pos');
+  if(uc<0||cc<0){alert('Format non reconnu.');return;}
+  const rows=[];
+  for(let i=1;i<lines.length;i++){
+    const c=spl(lines[i],sep);const url=(c[uc]||'').replace(/"/g,'').trim();if(!url)continue;
+    rows.push({url,clicks:parseInt((c[cc]||'0').replace(/\D/g,''))||0,impressions:ic>=0?parseInt((c[ic]||'0').replace(/\D/g,''))||0:0,ctr:tc>=0?parseFloat((c[tc]||'0').replace('%','').replace(',','.'))||0:0,position:pc>=0?parseFloat((c[pc]||'0').replace(',','.'))||0:0});
   }
-
-  const parsed = [];
-  for (let i = 1; i < lines.length; i++) {
-    const cols = splitCSVLine(lines[i], sep);
-    if (cols.length < 2) continue;
-    const url = (cols[urlCol] || '').replace(/"/g, '').trim();
-    if (!url) continue;
-
-    const clicks      = parseInt((cols[clkCol] || '0').replace(/[^0-9]/g, '')) || 0;
-    const impressions = impCol >= 0 ? parseInt((cols[impCol] || '0').replace(/[^0-9]/g, '')) || 0 : 0;
-    const ctr         = ctrCol >= 0 ? parseFloat((cols[ctrCol] || '0').replace('%','').replace(',','.')) || 0 : (impressions > 0 ? clicks / impressions * 100 : 0);
-    const position    = posCol >= 0 ? parseFloat((cols[posCol] || '0').replace(',','.')) || 0 : 0;
-
-    parsed.push({ url, clicks, impressions, ctr, position });
-  }
-
-  if (parsed.length === 0) { alert('Aucune ligne de données trouvée dans le CSV.'); return; }
-
-  allData = parsed;
-  filteredData = [...allData];
-  currentPage = 0;
-
-  // Update sidebar stats
-  document.getElementById('stat-rows').textContent = `${parsed.length} articles`;
-  document.getElementById('stat-period').textContent = filename.replace('.csv','').replace('.tsv','');
-  document.getElementById('stat-loaded').textContent = '✓ Chargé';
-  document.getElementById('sidebar-stats').style.display = 'block';
-
-  renderDashboard();
+  if(!rows.length){alert('Aucune donnée.');return;}
+  allData=rows;filtData=[...allData];
+  document.getElementById('connectArea').style.display='none';
+  document.getElementById('dashContent').style.display='block';
+  renderAll();addMsg('ai',`✓ **${rows.length} articles** importés.\n\n**${detectOpps(rows).length} opportunités** détectées. Posez vos questions !`);
 }
+function spl(l,sep){const r=[];let c='',q=false;for(const ch of l){if(ch==='"')q=!q;else if(ch===sep&&!q){r.push(c);c='';}else c+=ch;}r.push(c);return r;}
 
-function splitCSVLine(line, sep) {
-  const result = []; let cur = ''; let inQ = false;
-  for (let i = 0; i < line.length; i++) {
-    const c = line[i];
-    if (c === '"') { inQ = !inQ; }
-    else if (c === sep && !inQ) { result.push(cur); cur = ''; }
-    else cur += c;
-  }
-  result.push(cur);
-  return result;
+/* RENDER */
+function renderAll(){renderKPIs();renderChart();srt(sk,false);renderOpps();}
+function renderKPIs(){
+  const tot=k=>allData.reduce((s,r)=>s+r[k],0);
+  const tc=tot('clicks'),ti=tot('impressions'),avgCTR=ti>0?tc/ti*100:0;
+  const avgPos=allData.filter(r=>r.position>0).reduce((s,r,_,a)=>s+r.position/a.length,0);
+  document.getElementById('kpiGrid').innerHTML=`
+    <div class="kpi"><div class="kpi-lbl">Clics Discover</div><div class="kpi-val" style="color:var(--accent)">${fmt(tc)}</div><div class="kpi-sub">${allData.length} articles</div></div>
+    <div class="kpi"><div class="kpi-lbl">Impressions</div><div class="kpi-val" style="color:var(--a3)">${fmt(ti)}</div><div class="kpi-sub">Période totale</div></div>
+    <div class="kpi"><div class="kpi-lbl">CTR moyen</div><div class="kpi-val" style="color:${avgCTR>5?'var(--green)':avgCTR>2?'var(--accent)':'var(--a2)'}">${avgCTR.toFixed(1)}%</div><div class="kpi-sub">${avgCTR>5?'Excellent':avgCTR>2?'Correct':'À améliorer'}</div></div>
+    <div class="kpi"><div class="kpi-lbl">Position moy.</div><div class="kpi-val" style="color:var(--purple)">${avgPos>0?avgPos.toFixed(1):'—'}</div><div class="kpi-sub">Dans le feed</div></div>`;
 }
-
-/* ═══════════════════════════
-   RENDER
-═══════════════════════════ */
-function renderDashboard() {
-  document.getElementById('dashboardContent').style.display = 'block';
-  document.getElementById('emptyState').style.display = 'none';
-  importZone.style.display = 'none';
-
-  renderKPIs();
-  renderChart();
-  sortData(currentSort.key, false);
+function renderChart(){
+  const data=[...allData].sort((a,b)=>b.clicks-a.clicks);
+  const sz=Math.max(1,Math.floor(data.length/20));const bkts=[];
+  for(let i=0;i<data.length;i+=sz){const sl=data.slice(i,i+sz);bkts.push({clicks:sl.reduce((s,r)=>s+r.clicks,0),impressions:sl.reduce((s,r)=>s+r.impressions,0),ctr:sl.reduce((s,r)=>s+r.ctr,0)/sl.length});}
+  const W=700,H=130,P=12,vals=bkts.map(b=>b[metric]),max=Math.max(...vals)||1;
+  const pts=vals.map((v,i)=>[P+(i/Math.max(bkts.length-1,1))*(W-P*2),H-P-(v/max)*(H-P*2)]);
+  if(!pts.length){document.getElementById('chartSvg').innerHTML='';return;}
+  const path=pts.map((p,i)=>`${i?'L':'M'}${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' ');
+  const area=path+` L${pts[pts.length-1][0].toFixed(1)},${H} L${pts[0][0].toFixed(1)},${H} Z`;
+  const col=metric==='clicks'?'#e8ff47':metric==='impressions'?'#7eb8ff':'#4ade80';
+  document.getElementById('chartSvg').innerHTML=`<defs><linearGradient id="cg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${col}" stop-opacity=".15"/><stop offset="100%" stop-color="${col}" stop-opacity="0"/></linearGradient></defs><path d="${area}" fill="url(#cg)"/><path d="${path}" fill="none" stroke="${col}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>${pts.map(([x,y])=>`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2" fill="${col}" opacity=".7"/>`).join('')}`;
 }
-
-function renderKPIs() {
-  const totalClicks = allData.reduce((s, r) => s + r.clicks, 0);
-  const totalImpr   = allData.reduce((s, r) => s + r.impressions, 0);
-  const avgCTR      = totalImpr > 0 ? (totalClicks / totalImpr * 100) : 0;
-  const avgPos      = allData.filter(r => r.position > 0).reduce((s, r, _, a) => s + r.position / a.length, 0);
-  const topArticle  = [...allData].sort((a,b) => b.clicks - a.clicks)[0];
-
-  document.getElementById('kpiGrid').innerHTML = `
-    <div class="kpi-card">
-      <div class="kpi-label">Clics Discover</div>
-      <div class="kpi-value" style="color:var(--accent)">${fmtNum(totalClicks)}</div>
-      <div class="kpi-delta neutral">${allData.length} articles</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-label">Impressions</div>
-      <div class="kpi-value" style="color:var(--accent3)">${fmtNum(totalImpr)}</div>
-      <div class="kpi-delta neutral">Total période</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-label">CTR moyen</div>
-      <div class="kpi-value" style="color:${avgCTR > 5 ? 'var(--green)' : avgCTR > 2 ? 'var(--accent)' : 'var(--accent2)'}">${avgCTR.toFixed(1)}%</div>
-      <div class="kpi-delta ${avgCTR > 5 ? 'up' : avgCTR > 2 ? 'neutral' : 'down'}">${avgCTR > 5 ? '↑ Excellent' : avgCTR > 2 ? '→ Correct' : '↓ À améliorer'}</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-label">Position moy.</div>
-      <div class="kpi-value" style="color:var(--purple)">${avgPos > 0 ? avgPos.toFixed(1) : '—'}</div>
-      <div class="kpi-delta neutral">Dans le feed</div>
-    </div>
-    ${topArticle ? `
-    <div class="kpi-card" style="grid-column:span 2">
-      <div class="kpi-label">Meilleur article</div>
-      <div style="font-family:var(--mono);font-size:.72rem;color:var(--accent3);margin-bottom:.3rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${topArticle.url}</div>
-      <div class="kpi-delta up">↑ ${fmtNum(topArticle.clicks)} clics · ${topArticle.impressions > 0 ? (topArticle.clicks/topArticle.impressions*100).toFixed(1) : '—'}% CTR</div>
-    </div>` : ''}
-  `;
-}
-
-function renderChart() {
-  // Simulate time series from data (group into buckets of 10 articles)
-  const data = [...allData].sort((a,b) => b.clicks - a.clicks);
-  const buckets = [];
-  const size = Math.max(1, Math.floor(data.length / 20));
-  for (let i = 0; i < data.length; i += size) {
-    const slice = data.slice(i, i + size);
-    buckets.push({
-      clicks: slice.reduce((s,r) => s + r.clicks, 0),
-      impressions: slice.reduce((s,r) => s + r.impressions, 0),
-      ctr: slice.reduce((s,r) => s + r.ctr, 0) / slice.length,
-    });
-  }
-  drawChart(buckets);
-}
-
-function drawChart(buckets) {
-  const svg = document.getElementById('chartSvg');
-  if (!buckets.length) { svg.innerHTML = ''; return; }
-
-  const W = 800, H = 160, PAD = 20;
-  const vals = buckets.map(b => b[currentMetric]);
-  const maxV = Math.max(...vals) || 1;
-  const minV = 0;
-  const pts = vals.map((v, i) => {
-    const x = PAD + (i / Math.max(buckets.length - 1, 1)) * (W - PAD * 2);
-    const y = H - PAD - ((v - minV) / (maxV - minV)) * (H - PAD * 2);
-    return [x, y];
-  });
-
-  const pathD = pts.map((p, i) => `${i === 0 ? 'M' : 'L'}${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' ');
-  const areaD = pathD + ` L${pts[pts.length-1][0].toFixed(1)},${H} L${pts[0][0].toFixed(1)},${H} Z`;
-
-  const color = currentMetric === 'clicks' ? '#e8ff47' : currentMetric === 'impressions' ? '#7eb8ff' : '#4ade80';
-
-  svg.innerHTML = `
-    <defs>
-      <linearGradient id="grad" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="${color}" stop-opacity="0.18"/>
-        <stop offset="100%" stop-color="${color}" stop-opacity="0"/>
-      </linearGradient>
-    </defs>
-    <path d="${areaD}" fill="url(#grad)"/>
-    <path d="${pathD}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-    ${pts.map(([x,y]) => `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.5" fill="${color}" opacity=".6"/>`).join('')}
-  `;
-}
-
-function setMetric(m, btn) {
-  currentMetric = m;
-  document.querySelectorAll('.section-actions .btn-sm').forEach(b => b.classList.remove('active'));
-  if (btn) btn.classList.add('active');
-  renderChart();
-}
-
-/* ═══════════════════════════
-   TABLE
-═══════════════════════════ */
-function sortData(key, toggleDir = true) {
-  if (toggleDir && currentSort.key === key) currentSort.dir *= -1;
-  else if (currentSort.key !== key) { currentSort.key = key; currentSort.dir = -1; }
-  currentSort.key = key;
-  filteredData.sort((a, b) => currentSort.dir * (a[key] > b[key] ? 1 : a[key] < b[key] ? -1 : 0));
-  currentPage = 0;
-  renderTable();
-}
-
-function sortBy(key, btn) {
-  sortData(key, true);
-  if (btn) {
-    document.querySelectorAll('.filter-bar .btn-sm').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-  }
-}
-
-function filterTable() {
-  const q = document.getElementById('searchInput').value.toLowerCase();
-  filteredData = allData.filter(r => r.url.toLowerCase().includes(q));
-  sortData(currentSort.key, false);
-}
-
-function renderTable() {
-  const start = currentPage * PAGE_SIZE;
-  const page = filteredData.slice(start, start + PAGE_SIZE);
-  const maxCTR = Math.max(...filteredData.map(r => r.ctr), 0.001);
-
-  document.getElementById('tableBody').innerHTML = page.map(r => {
-    const ctrPct = (r.ctr / maxCTR * 80).toFixed(0);
-    const posCls = r.position <= 3 ? 'pos-top' : r.position <= 8 ? 'pos-mid' : 'pos-low';
-    const slug = r.url.replace(/^https?:\/\/[^/]+/, '').slice(0, 60) || r.url;
-    const avgCTR = r.impressions > 0 ? (r.clicks / r.impressions * 100) : r.ctr;
-
-    return `<tr>
-      <td class="td-url">
-        <a href="${r.url}" target="_blank" title="${r.url}">${slug}</a>
-      </td>
-      <td class="td-num">${fmtNum(r.clicks)}</td>
-      <td class="td-num">${fmtNum(r.impressions)}</td>
-      <td class="td-ctr">
-        <div class="ctr-bar">
-          <div class="ctr-pill" style="width:${ctrPct}px;background:${avgCTR > 5 ? 'var(--green)' : avgCTR > 2 ? 'var(--accent)' : 'var(--accent2)'}"></div>
-          <span>${avgCTR.toFixed(1)}%</span>
-        </div>
-      </td>
-      <td class="td-pos"><span class="pos-badge ${posCls}">${r.position > 0 ? r.position.toFixed(0) : '—'}</span></td>
-      <td>
-        <a href="discoforge.html" class="analyze-cta" title="Analyser ce titre">
-          <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" stroke="currentColor" stroke-width="1.5"/><path d="M4 6l1.5 1.5L8 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Analyser
-        </a>
-      </td>
-    </tr>`;
+function setMetric(m,btn){metric=m;document.querySelectorAll('.bx').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');renderChart();}
+function srt(key,tog=true){if(tog&&sk===key)sd*=-1;else if(sk!==key){sk=key;sd=-1;}sk=key;filtData.sort((a,b)=>sd*(a[key]>b[key]?1:a[key]<b[key]?-1:0));page=0;renderTable();}
+function filterTable(){const q=document.getElementById('searchInp').value.toLowerCase();filtData=allData.filter(r=>r.url.toLowerCase().includes(q));srt(sk,false);}
+function renderTable(){
+  const start=page*PAGE,pg=filtData.slice(start,start+PAGE);
+  const mCTR=Math.max(...filtData.map(r=>r.ctr),0.001);
+  document.getElementById('tblBody').innerHTML=pg.map(r=>{
+    const slug=r.url.replace(/^https?:\/\/[^/]+/,'').slice(0,48)||r.url;
+    const ctr=r.impressions>0?r.clicks/r.impressions*100:r.ctr;
+    const bw=(ctr/mCTR*55).toFixed(0),bc=ctr>5?'var(--green)':ctr>2?'var(--accent)':'var(--a2)';
+    const pc=r.position<=3?'pa':r.position<=8?'pb':'pc';
+    return `<tr><td class="td-url"><a href="${r.url}" target="_blank" title="${r.url}">${slug}</a></td><td class="td-n">${fmt(r.clicks)}</td><td class="td-n">${fmt(r.impressions)}</td><td><div class="bar-cell"><div class="bar" style="width:${bw}px;background:${bc}"></div><span style="font-family:var(--mono);font-size:.66rem;">${ctr.toFixed(1)}%</span></div></td><td><span class="pos-pill ${pc}">${r.position>0?r.position.toFixed(0):'—'}</span></td><td><button class="ab" onclick="ask('Analyse cet article pour Discover : ${slug.replace(/'/g,"\\'")}')">→</button></td></tr>`;
   }).join('');
-
-  const total = filteredData.length;
-  document.getElementById('paginationInfo').textContent = `${start + 1}–${Math.min(start + PAGE_SIZE, total)} sur ${total} articles`;
-  document.getElementById('prevBtn').disabled = currentPage === 0;
-  document.getElementById('nextBtn').disabled = start + PAGE_SIZE >= total;
+  const tot=filtData.length;
+  document.getElementById('pagInfo').textContent=`${start+1}–${Math.min(start+PAGE,tot)} / ${tot}`;
+  document.getElementById('pgP').disabled=page===0;document.getElementById('pgN').disabled=start+PAGE>=tot;
 }
+function chPage(d){page+=d;renderTable();document.querySelector('.tbl-wrap').scrollIntoView({behavior:'smooth',block:'nearest'});}
 
-function changePage(dir) {
-  currentPage += dir;
-  renderTable();
-  document.querySelector('.table-wrap').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+/* OPPORTUNITÉS */
+function detectOpps(data){
+  const o=[];const sorted=[...data].sort((a,b)=>b.impressions-a.impressions);
+  sorted.filter(r=>r.impressions>100&&r.ctr<2).slice(0,3).forEach(r=>o.push({type:'urgent',tag:'CTR critique',title:`CTR à ${r.ctr.toFixed(1)}% — ${fmt(r.impressions)} impressions perdues`,meta:r.url.replace(/^https?:\/\/[^/]+/,'').slice(0,50),action:'Optimisez le titre pour multiplier les clics par 3'}));
+  data.filter(r=>r.position<=5&&r.ctr<5&&r.impressions>50).slice(0,2).forEach(r=>o.push({type:'improve',tag:`Position #${r.position.toFixed(0)}`,title:`Bien positionné mais CTR faible (${r.ctr.toFixed(1)}%)`,meta:r.url.replace(/^https?:\/\/[^/]+/,'').slice(0,50),action:'Améliorez l\'image og pour augmenter le CTR'}));
+  [...data].sort((a,b)=>b.clicks-a.clicks).slice(0,2).forEach(r=>{if(r.clicks>10)o.push({type:'win',tag:'Top performer',title:`${fmt(r.clicks)} clics — article phare`,meta:r.url.replace(/^https?:\/\/[^/]+/,'').slice(0,50),action:'Publiez des articles similaires pour capitaliser'});});
+  return o;
 }
-
-/* ═══════════════════════════
-   UTILS
-═══════════════════════════ */
-function fmtNum(n) {
-  if (n >= 1000000) return (n/1000000).toFixed(1) + 'M';
-  if (n >= 1000) return (n/1000).toFixed(1) + 'k';
-  return n.toString();
+function renderOpps(){
+  const opps=detectOpps(allData);
+  if(!opps.length){document.getElementById('oppList').innerHTML='<div class="empty-rp"><div class="ei">✓</div><div class="et">Tout va bien</div><div class="es">Aucune opportunité critique.</div></div>';return;}
+  document.getElementById('oppList').innerHTML=opps.map(o=>`<div class="opp" onclick="ask('${o.action.replace(/'/g,"\\'")}')"><div class="opp-tag ot-${o.type}">${{urgent:'⚡ Urgent',improve:'→ À améliorer',win:'★ Consolider'}[o.type]}</div><div class="opp-title">${o.title}</div><div class="opp-meta">${o.meta}</div><div class="opp-action">${o.action}</div></div>`).join('');
 }
 
-function showView(v) {
-  document.querySelectorAll('.sidebar-item').forEach((el, i) => {
-    if (i < 3) el.classList.toggle('active', el.getAttribute('onclick')?.includes(v));
-  });
+/* CHAT IA */
+function addMsg(role,text){
+  const el=document.createElement('div');el.className=`msg ${role}`;
+  if(role==='ai')el.innerHTML=`<div class="msg-lbl">DiscoForge AI</div><div class="msg-body">${fmtMsg(text)}</div>`;
+  else el.innerHTML=`<div class="msg-body">${esc(text)}</div>`;
+  document.getElementById('chatMsgs').appendChild(el);el.scrollIntoView({behavior:'smooth'});
+}
+function fmtMsg(t){return esc(t).replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\*(.+?)\*/g,'<em>$1</em>').replace(/\n/g,'<br>');}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function fmt(n){return n>=1e6?(n/1e6).toFixed(1)+'M':n>=1000?(n/1000).toFixed(1)+'k':String(n);}
+
+function sendChat(){const inp=document.getElementById('chatInp');const msg=inp.value.trim();if(!msg)return;inp.value='';ask(msg);}
+
+async function ask(text){
+  addMsg('user',text);
+  const btn=document.getElementById('sendBtn');btn.disabled=true;
+  const th=document.createElement('div');th.className='msg ai';
+  th.innerHTML='<div class="msg-lbl">DiscoForge AI</div><div class="msg-body thinking-dot">Analyse en cours</div>';
+  document.getElementById('chatMsgs').appendChild(th);th.scrollIntoView({behavior:'smooth'});
+
+  const ctx=buildCtx();
+  const sys=`Tu es DiscoForge AI, expert Google Discover. Tu analyses des données de performance et donnes des conseils actionnables, précis et chiffrés en français.
+
+DONNÉES ACTUELLES :
+${ctx}
+
+Règles : réponse concise (max 200 mots), cite des chiffres précis, utilise **gras** pour points clés, donne 1-3 actions concrètes. Si pas de données : invite à connecter la Search Console.`;
+
+  try{
+    const r=await fetch('/api/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({titles:[text],prompt:sys+`\n\nQuestion : "${text}"\n\nRéponds directement avec les données disponibles.`})});
+    const d=await r.json();th.remove();
+    addMsg('ai',(d.results&&d.results[0]&&(d.results[0].raw||d.results[0].error))||'Désolé, je n\'ai pas pu répondre. Réessayez.');
+  }catch(e){th.remove();addMsg('ai','Erreur réseau. Vérifiez votre connexion.');}
+  btn.disabled=false;
 }
 
-function clearData() {
-  allData = []; filteredData = [];
-  document.getElementById('dashboardContent').style.display = 'none';
-  document.getElementById('sidebar-stats').style.display = 'none';
-  importZone.style.display = 'block';
-  document.getElementById('csvInput').value = '';
+function buildCtx(){
+  if(!allData.length)return'Aucune donnée chargée.';
+  const tot=k=>allData.reduce((s,r)=>s+r[k],0);
+  const tc=tot('clicks'),ti=tot('impressions'),avgCTR=ti>0?tc/ti*100:0;
+  const top=[...allData].sort((a,b)=>b.clicks-a.clicks).slice(0,5);
+  const low=[...allData].filter(r=>r.impressions>50).sort((a,b)=>a.ctr-b.ctr).slice(0,3);
+  return `Articles: ${allData.length} | Clics: ${tc} | Impressions: ${ti} | CTR moyen: ${avgCTR.toFixed(2)}%
+Top 5: ${top.map((r,i)=>`${i+1}.${r.url.replace(/^https?:\/\/[^/]+/,'').slice(0,50)} (${r.clicks}clics,CTR${r.ctr.toFixed(1)}%)`).join(' | ')}
+CTR faible: ${low.map(r=>`${r.url.replace(/^https?:\/\/[^/]+/,'').slice(0,50)}(${r.ctr.toFixed(1)}%,${r.impressions}impr)`).join(' | ')}`;
 }
 
-function exportData() {
-  if (!allData.length) return;
-  const rows = [['URL','Clics','Impressions','CTR (%)','Position']];
-  allData.forEach(r => rows.push([r.url, r.clicks, r.impressions, r.ctr.toFixed(2), r.position.toFixed(1)]));
-  const csv = rows.map(r => r.join(',')).join('\n');
-  const a = document.createElement('a');
-  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
-  a.download = 'discoforge-discover-export.csv';
-  a.click();
+function exportCSV(){
+  const rows=[['URL','Clics','Impressions','CTR (%)','Position']];
+  allData.forEach(r=>rows.push([r.url,r.clicks,r.impressions,r.ctr.toFixed(2),r.position.toFixed(1)]));
+  const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(rows.map(r=>r.join(',')).join('\n'));a.download='discoforge.csv';a.click();
 }
-}
+
+/* INIT */
+window.addEventListener('load',async()=>{
+  if(!checkAccess())return;
+  const saved=sessionStorage.getItem('gsc_tok');
+  if(saved){gscTok=saved;await loadSites();}
+  await handleOAuth();
+});
 </script>
 </body>
 </html>
