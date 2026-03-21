@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /admin-beta.html
+Disallow: /acces-pro.html
+Disallow: /beta.html
+Disallow: /dashboard.html
+
+Sitemap: https://discoforge.com/sitemap.xml
