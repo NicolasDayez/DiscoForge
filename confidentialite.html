@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Instrument+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5f2eb;--ink:#0e0d0b;--ink2:#3a3832;--ink3:#8a8780;--ink4:#c4c1b8;--accent:#d4380d;--accent2:#1a6b3a;--surface:#eeeae0;--surface2:#e6e2d6;--border:#d4d0c4;--border2:#c0bbb0;--gold:#b8860b;--serif:'Playfair Display',serif;--sans:'Instrument Sans',sans-serif;--mono:'JetBrains Mono',monospace;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-weight:300;overflow-x:hidden;}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");opacity:.6;}
+nav{position:sticky;top:0;left:0;right:0;z-index:100;padding:1.1rem 3rem;display:flex;align-items:center;justify-content:space-between;background:rgba(245,242,235,0.95);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);}
+.nav-logo{font-family:var(--serif);font-size:1.4rem;font-weight:700;color:var(--ink);text-decoration:none;letter-spacing:-.02em;display:flex;align-items:center;gap:.5rem;}
+.nav-dot{width:7px;height:7px;background:var(--accent);border-radius:50%;animation:bdot 2.5s ease-in-out infinite;}
+@keyframes bdot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.3)}}
+.nav-links{display:flex;align-items:center;gap:1.5rem;}
+.nav-links a{font-size:.78rem;color:var(--ink2);text-decoration:none;font-weight:400;letter-spacing:.04em;transition:color .15s;}
+.nav-links a:hover{color:var(--accent);}
+.nav-cta{background:var(--ink);color:var(--bg);padding:.5rem 1.2rem;border-radius:2px;font-size:.75rem;font-weight:500;letter-spacing:.06em;text-decoration:none;transition:background .18s;font-family:var(--mono);}
+.nav-cta:hover{background:var(--accent);color:#fff;}
+.page-hero{padding:5rem 3rem 3rem;max-width:860px;margin:0 auto;}
+.page-kicker{font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem;display:flex;align-items:center;gap:.7rem;}
+.page-kicker::before{content:'';width:1.8rem;height:1px;background:var(--accent);}
+.page-h1{font-family:var(--serif);font-size:clamp(2rem,5vw,3.2rem);line-height:1.07;letter-spacing:-.03em;font-weight:700;margin-bottom:1rem;}
+.page-h1 em{font-style:italic;color:var(--accent);}
+.page-meta{font-family:var(--mono);font-size:.65rem;color:var(--ink3);letter-spacing:.08em;margin-bottom:2rem;}
+.page-content{max-width:860px;margin:0 auto;padding:0 3rem 5rem;}
+.page-content h2{font-family:var(--serif);font-size:1.5rem;font-weight:700;letter-spacing:-.02em;margin:2.5rem 0 1rem;padding-top:2rem;border-top:1px solid var(--border);}
+.page-content h2:first-child{margin-top:0;padding-top:0;border-top:none;}
+.page-content h3{font-family:var(--serif);font-size:1.1rem;font-weight:700;margin:1.5rem 0 .6rem;}
+.page-content p{font-size:.9rem;line-height:1.85;color:var(--ink2);margin-bottom:1rem;}
+.page-content ul,.page-content ol{padding-left:1.5rem;margin-bottom:1rem;}
+.page-content li{font-size:.9rem;line-height:1.75;color:var(--ink2);margin-bottom:.4rem;}
+.page-content strong{color:var(--ink);font-weight:500;}
+.page-content a{color:var(--accent);text-decoration:underline;text-underline-offset:3px;}
+.page-content .highlight{background:var(--surface);border:1px solid var(--border);border-radius:3px;padding:1.2rem 1.5rem;margin:1.5rem 0;font-family:var(--mono);font-size:.78rem;line-height:1.75;color:var(--ink2);}
+.page-content .highlight strong{color:var(--accent);}
+footer{background:var(--ink);border-top:1px solid #1a1a18;padding:2rem 3rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;}
+.footer-logo{font-family:var(--serif);font-size:1.1rem;color:rgba(245,242,235,.3);}
+.footer-links{display:flex;gap:1.5rem;flex-wrap:wrap;}
+.footer-links a{font-family:var(--mono);font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(245,242,235,.2);text-decoration:none;transition:color .15s;}
+.footer-links a:hover{color:rgba(245,242,235,.55);}
+.footer-copy{font-family:var(--mono);font-size:.56rem;letter-spacing:.08em;color:rgba(245,242,235,.15);text-transform:uppercase;}
+@media(max-width:720px){nav{padding:1rem 1.4rem;}.nav-links{display:none;}.page-hero,.page-content{padding-left:1.4rem;padding-right:1.4rem;}}
+</style>
+<title>Politique de Confidentialité — DiscoForge</title>
+</head>
+<body><nav>
+  <a href="index.html" class="nav-logo">DiscoForge <span class="nav-dot"></span></a>
+  <div class="nav-links">
+    <a href="discoforge.html">Analyser</a>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="blog.html">Blog</a>
+    <a href="contact.html">Contact</a>
+  </div>
+  <a href="discoforge.html" class="nav-cta">Essai gratuit →</a>
+</nav>
+<div class="page-hero">
+  <div class="page-kicker">Données personnelles</div>
+  <h1 class="page-h1">Politique de <em>Confidentialité</em></h1>
+  <div class="page-meta">Conforme RGPD · Dernière mise à jour Mars 2026</div>
+</div>
+<div class="page-content">
+  <h2>Responsable du traitement</h2>
+  <p>Nicolas Dayez, éditeur de DiscoForge, est responsable du traitement de vos données personnelles.</p>
+  <h2>Données collectées</h2>
+  <h3>Données que vous fournissez</h3>
+  <ul>
+    <li>Adresse email (formulaire de contact, inscription)</li>
+    <li>Nom et prénom (facultatif, formulaire de contact)</li>
+    <li>Contenus analysés (titres, images) — traités en temps réel, non stockés</li>
+  </ul>
+  <h3>Données collectées automatiquement</h3>
+  <ul>
+    <li>Données de navigation (pages visitées, durée de session)</li>
+    <li>Adresse IP (anonymisée après 24h)</li>
+    <li>Préférences stockées localement (localStorage du navigateur)</li>
+  </ul>
+  <h2>Finalités du traitement</h2>
+  <ul>
+    <li>Fourniture du service d'analyse DiscoForge</li>
+    <li>Gestion des abonnements et paiements (via Stripe)</li>
+    <li>Réponse aux demandes de contact</li>
+    <li>Amélioration du service</li>
+  </ul>
+  <h2>Base légale</h2>
+  <p>Le traitement est fondé sur l'exécution du contrat (art. 6.1.b RGPD) pour la fourniture du service, et sur votre consentement pour les communications marketing.</p>
+  <h2>Partage des données</h2>
+  <p>Vos données ne sont jamais vendues. Elles peuvent être partagées avec :</p>
+  <ul>
+    <li><strong>Anthropic</strong> (analyse IA des titres/images) — soumis à leur politique de confidentialité</li>
+    <li><strong>Stripe</strong> (paiements) — certifié PCI DSS</li>
+    <li><strong>Cloudflare</strong> (hébergement) — Privacy Shield UE-US</li>
+  </ul>
+  <h2>Conservation des données</h2>
+  <p>Les données de contact sont conservées 3 ans après le dernier contact. Les données de paiement sont gérées par Stripe selon leurs obligations légales.</p>
+  <h2>Vos droits</h2>
+  <p>Conformément au RGPD, vous disposez des droits d'accès, de rectification, d'effacement, de portabilité et d'opposition. Exercez-les via notre <a href="contact.html">formulaire de contact</a>.</p>
+  <h2>Cookies</h2>
+  <p>Consultez notre <a href="cookies.html">politique de cookies</a> pour plus d'informations.</p>
+</div><footer>
+  <div class="footer-logo">DiscoForge</div>
+  <div class="footer-links">
+    <a href="mentions-legales.html">Mentions légales</a>
+    <a href="confidentialite.html">Confidentialité</a>
+    <a href="cgu.html">CGU</a>
+    <a href="cgv.html">CGV</a>
+    <a href="cookies.html">Cookies</a>
+    <a href="contact.html">Contact</a>
+    <a href="a-propos.html">À propos</a>
+    <a href="blog.html">Blog</a>
+  </div>
+  <div class="footer-copy">© 2026 DiscoForge</div>
+</footer>
+</body></html>
