@@ -159,6 +159,14 @@ section { padding: 6rem 3rem; }
 .btn-inv:hover { background:var(--accent); color:#fff; }
 .btn-gold { background:var(--gold); color:#fff; }
 .btn-gold:hover { background:#9a7009; }
+.billing-toggle { display:flex; align-items:center; gap:1rem; margin-bottom:2rem; }
+.toggle-label { font-family:var(--mono); font-size:.65rem; letter-spacing:.1em; text-transform:uppercase; color:var(--ink3); cursor:pointer; transition:color .15s; }
+.toggle-label.active { color:var(--ink); }
+.toggle-switch { width:44px; height:24px; background:var(--border2); border-radius:12px; position:relative; cursor:pointer; transition:background .2s; flex-shrink:0; }
+.toggle-switch.on { background:var(--ink); }
+.toggle-switch::after { content:''; position:absolute; width:18px; height:18px; background:#fff; border-radius:50%; top:3px; left:3px; transition:transform .2s; }
+.toggle-switch.on::after { transform:translateX(20px); }
+.annual-badge { font-family:var(--mono); font-size:.6rem; letter-spacing:.1em; text-transform:uppercase; background:rgba(26,107,58,.1); color:var(--accent2); border:1px solid rgba(26,107,58,.2); padding:.2rem .6rem; border-radius:2rem; }
 .pass-spotlight { max-width:1050px; margin-top:1.4rem; background:var(--ink); border-radius:3px; padding:2rem 2.5rem; display:grid; grid-template-columns:1fr auto; gap:2rem; align-items:center; }
 .pass-kicker { font-family:var(--mono); font-size:.6rem; letter-spacing:.18em; text-transform:uppercase; color:var(--gold); margin-bottom:.6rem; }
 .pass-title { font-family:var(--serif); font-size:1.5rem; font-weight:700; color:var(--bg); letter-spacing:-.01em; margin-bottom:.5rem; }
@@ -220,9 +228,7 @@ footer { background:var(--ink); border-top:1px solid #1a1a18; padding:1.8rem 3re
     <a href="#compare">Avant / Après</a>
     <a href="#features">Fonctionnalités</a>
     <a href="#pricing">Tarifs</a>
-    <a href="blog.html">Blog</a>
-    <a href="a-propos.html">À propos</a>
-    <a href="contact.html">Contact</a>
+    <a href="#faq">FAQ</a>
   </div>
   <a href="discoforge.html" class="nav-cta">Essai gratuit →</a>
 </nav>
@@ -277,7 +283,7 @@ footer { background:var(--ink); border-top:1px solid #1a1a18; padding:1.8rem 3re
     </div>
     <div class="roi-verdict">
       <strong>Rentabilisé en 1 jour</strong>
-      DiscoForge Pro 29€/mois =<br>+1% CTR sur 1 article suffit.
+      DiscoForge Starter 49€/mois =<br>rentabilisé dès le 1er article optimisé.
     </div>
   </div>
 </div>
@@ -353,16 +359,20 @@ footer { background:var(--ink); border-top:1px solid #1a1a18; padding:1.8rem 3re
   <div class="section-wrap">
     <div class="reveal" style="margin-bottom:3rem;">
       <div class="section-kicker">Tarifs</div>
-      <h2 class="section-title">Simple.<br><em>Sans surprise.</em></h2>
-      <p style="font-size:.93rem;color:var(--ink2);line-height:1.78;max-width:480px;">L'analyse image — notre fonctionnalité la plus puissante — est réservée au Plan Pro. C'est elle qui coûte le plus en API et qui génère le plus de valeur.</p>
+      <h2 class="section-title">Sécurisez votre trafic Google Discover</em></h2>
+      <p style="font-size:.93rem;color:var(--ink2);line-height:1.78;max-width:480px;">Ne publiez plus à perte. Rentabilisez votre abonnement dès votre premier article optimisé.</p>
     </div>
     <div class="pricing-grid reveal">
 
       <!-- STARTER -->
       <div class="plan-card">
         <div class="plan-name">Starter</div>
-        <div class="plan-price"><sup>€</sup>49</div>
-        <div class="plan-period">par mois · sans engagement</div>
+        <div class="plan-price">
+          <span class="price-m"><sup>€</sup>49</span>
+          <span class="price-a" style="display:none"><sup>€</sup>41<span style="font-size:1rem;font-weight:300;letter-spacing:0">/mois</span></span>
+        </div>
+        <div class="plan-period price-m">par mois · sans engagement</div>
+        <div class="plan-period price-a" style="display:none">490€/an · <s style="opacity:.4;font-size:.85em">588€</s> → <span style="color:var(--accent2)">98€ économisés</span></div>
         <div class="plan-tagline">Éditeurs de niche, solopreneurs.</div>
         <div class="plan-divider"></div>
         <ul class="plan-features">
@@ -374,15 +384,20 @@ footer { background:var(--ink); border-top:1px solid #1a1a18; padding:1.8rem 3re
           <li class="no">Dashboard Search Console</li>
           <li class="no">Export CSV</li>
         </ul>
-        <a href="https://buy.stripe.com/3cI5kC5co6IT7ZeaO79Ve02" class="plan-btn btn-outline">Commencer →</a>
+        <a href="https://buy.stripe.com/3cI5kC5co6IT7ZeaO79Ve02" class="plan-btn btn-outline price-m-btn">Commencer →</a>
+        <a href="https://buy.stripe.com/3cI5kC5co6IT7ZeaO79Ve02" class="plan-btn btn-outline price-a-btn" style="display:none">Commencer (annuel) →</a>
       </div>
 
       <!-- PRO -->
       <div class="plan-card featured">
         <div class="plan-badge">Recommandé</div>
         <div class="plan-name">Pro</div>
-        <div class="plan-price"><sup>€</sup>149</div>
-        <div class="plan-period">par mois · sans engagement</div>
+        <div class="plan-price">
+          <span class="price-m"><sup>€</sup>149</span>
+          <span class="price-a" style="display:none"><sup>€</sup>124<span style="font-size:1rem;font-weight:300;letter-spacing:0">/mois</span></span>
+        </div>
+        <div class="plan-period price-m">par mois · sans engagement</div>
+        <div class="plan-period price-a" style="display:none">1490€/an · <s style="opacity:.35;font-size:.85em">1788€</s> → <span style="color:#6ee7a8">298€ économisés</span></div>
         <div class="plan-tagline">Agences de contenu, rédacteurs SEO.</div>
         <div class="plan-divider"></div>
         <ul class="plan-features">
@@ -395,14 +410,19 @@ footer { background:var(--ink); border-top:1px solid #1a1a18; padding:1.8rem 3re
           <li>Historique 90 jours</li>
           <li>Export CSV</li>
         </ul>
-        <a href="https://buy.stripe.com/3cI8wO9sEd7ha7m8FZ9Ve01" class="plan-btn btn-solid">Passer Pro →</a>
+        <a href="https://buy.stripe.com/3cI8wO9sEd7ha7m8FZ9Ve01" class="plan-btn btn-solid price-m-btn">Passer Pro →</a>
+        <a href="https://buy.stripe.com/3cI8wO9sEd7ha7m8FZ9Ve01" class="plan-btn btn-solid price-a-btn" style="display:none">Passer Pro (annuel) →</a>
       </div>
 
       <!-- ENTERPRISE -->
       <div class="plan-card">
         <div class="plan-name">Enterprise</div>
-        <div class="plan-price"><sup>€</sup>499</div>
-        <div class="plan-period">par mois · sur devis au-delà</div>
+        <div class="plan-price">
+          <span class="price-m"><sup>€</sup>499</span>
+          <span class="price-a" style="display:none"><sup>€</sup>416<span style="font-size:1rem;font-weight:300;letter-spacing:0">/mois</span></span>
+        </div>
+        <div class="plan-period price-m">par mois · sur devis au-delà</div>
+        <div class="plan-period price-a" style="display:none">4990€/an · <s style="opacity:.4;font-size:.85em">5988€</s> → <span style="color:var(--accent2)">998€ économisés</span></div>
         <div class="plan-tagline">Médias d'actualité, groupes de presse.</div>
         <div class="plan-divider"></div>
         <ul class="plan-features">
@@ -419,7 +439,7 @@ footer { background:var(--ink); border-top:1px solid #1a1a18; padding:1.8rem 3re
 
     </div>
 
-        <!-- PASS DUAL -->
+    <!-- PASS DUAL -->
     <div class="reveal" style="max-width:1050px;margin-top:1.4rem;">
       <div style="font-family:var(--mono);font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:.8rem;">⚡ Accès flash · Sans abonnement · Sans engagement</div>
       <h3 style="font-family:var(--serif);font-size:1.6rem;font-weight:700;margin-bottom:.4rem;letter-spacing:-.02em;">Pas besoin d'abonnement pour aujourd'hui</h3>
@@ -444,6 +464,7 @@ footer { background:var(--ink); border-top:1px solid #1a1a18; padding:1.8rem 3re
         </div>
       </div>
     </div>
+
 
     <!-- ROI BOX -->
     <div class="roi-box reveal">
@@ -470,7 +491,7 @@ footer { background:var(--ink); border-top:1px solid #1a1a18; padding:1.8rem 3re
     <div class="faq-list reveal">
       <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">Pourquoi l'analyse image est réservée au Pro ?<span class="faq-toggle">+</span></div><div class="faq-a">L'analyse d'image utilise Claude Vision — un modèle multimodal plus coûteux en API. C'est aussi notre fonctionnalité la plus différenciante : peu d'outils Discover vérifient la conformité og:image de façon aussi granulaire. Elle est réservée au Pro pour valoriser l'abonnement à sa juste mesure.</div></div>
       <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">Le score pCTR est-il fiable ?<span class="faq-toggle">+</span></div><div class="faq-a">Le modèle est calibré sur la documentation publique du pipeline Discover en 9 étapes de Google et les signaux connus : entités Knowledge Graph, freshness buckets, pénalité clickbait. C'est un indicateur prédictif, pas une valeur certifiée — mais il reflète fidèlement les critères de ranking documentés.</div></div>
-      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">À quoi sert le Pass News Day à 9€ ?<span class="faq-toggle">+</span></div><div class="faq-a">Pour les rédacteurs ou freelances avec un gros dossier ponctuel à optimiser sans vouloir s'abonner. 9€ pour 24h d'accès illimité titres + images — idéal pour un jour de bouclage, une couverture breaking news, ou avant de soumettre un dossier à un client.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">À quoi sert le Pass News Day à 19€ ?<span class="faq-toggle">+</span></div><div class="faq-a">Pour les rédacteurs ou freelances avec un gros dossier ponctuel à optimiser sans vouloir s'abonner. 119€ pour 24h d'accès illimité titres + images. Le Pass Weekend à 29€ donne 48h pour les couvertures de fond. — idéal pour un jour de bouclage, une couverture breaking news, ou avant de soumettre un dossier à un client. Le Pass Weekend (29€/48h) est disponible pour les week-ends de fond.</div></div>
       <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">Quelle taille d'image recommandez-vous ?<span class="faq-toggle">+</span></div><div class="faq-a">Google Discover recommande minimum 1200px de large avec un ratio 16:9. Évitez les images portrait, les logos seuls et les images avec du texte incrusté — notre analyseur détecte et pénalise ces cas automatiquement.</div></div>
       <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">Puis-je annuler à tout moment ?<span class="faq-toggle">+</span></div><div class="faq-a">Oui. Aucun engagement, annulation en un clic depuis votre tableau de bord Stripe. Votre accès reste actif jusqu'à la fin de la période déjà payée.</div></div>
       <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">Vous proposez des factures pour les entreprises ?<span class="faq-toggle">+</span></div><div class="faq-a">Oui. Chaque paiement génère automatiquement une facture TVA via Stripe. Pour les plans Équipe avec facturation personnalisée (bon de commande, etc.), contactez-nous directement.</div></div>
@@ -492,25 +513,29 @@ footer { background:var(--ink); border-top:1px solid #1a1a18; padding:1.8rem 3re
   <div class="footer-logo">DiscoForge</div>
   <div class="footer-links">
     <a href="discoforge.html">Outil</a>
-    <a href="blog.html">Blog</a>
-    <a href="audit.html">Audit</a>
-    <a href="google-profile.html">Google Profile</a>
     <a href="#pricing">Tarifs</a>
-    <a href="a-propos.html">À propos</a>
-    <a href="contact.html">Contact</a>
-    <a href="mentions-legales.html">Mentions légales</a>
-    <a href="confidentialite.html">Confidentialité</a>
-    <a href="cgu.html">CGU · CGV</a>
-    <a href="cookies.html">Cookies</a>
+    <a href="#faq">FAQ</a>
+    <a href="/cdn-cgi/l/email-protection#a8cbc7c6dcc9cbdce8ccc1dbcbc7cec7dacfcd86c1c7">Contact</a>
   </div>
   <div class="footer-copy">© 2026 DiscoForge</div>
 </footer>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 function toggleFaq(el) { el.parentElement.classList.toggle('open'); }
+/* ── Billing toggle ── */
+let billing = 'monthly';
+function toggleBilling() { setBilling(billing === 'monthly' ? 'annual' : 'monthly'); }
+function setBilling(mode) {
+  billing = mode;
+  const isAnnual = mode === 'annual';
+  document.getElementById('toggleSwitch').classList.toggle('on', isAnnual);
+  document.getElementById('labelM').classList.toggle('active', !isAnnual);
+  document.getElementById('labelA').classList.toggle('active', isAnnual);
+  document.querySelectorAll('.price-m').forEach(el => el.style.display = isAnnual ? 'none' : '');
+  document.querySelectorAll('.price-a').forEach(el => el.style.display = isAnnual ? '' : 'none');
+  document.querySelectorAll('.price-m-btn').forEach(el => el.style.display = isAnnual ? 'none' : '');
+  document.querySelectorAll('.price-a-btn').forEach(el => el.style.display = isAnnual ? '' : 'none');
+}
+
 const obs = new IntersectionObserver(entries => {
-  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
-}, { threshold: 0.08 });
-document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
-</script>
-</body></html>
+  entries.forEach(e => { if (e.isInter
