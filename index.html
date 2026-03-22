@@ -407,7 +407,7 @@ footer { background:var(--ink); border-top:1px solid #1a1a18; padding:1.8rem 3re
           <li>Export CSV + PDF rapport</li>
           <li>Support prioritaire</li>
         </ul>
-        <a href="/cdn-cgi/l/email-protection#dab9b5b4aebbb9ae9abeb3a9b9b5bcb5a8bdbff4b3b5" class="plan-btn btn-outline">Nous contacter</a>
+        <a href="/cdn-cgi/l/email-protection#482b27263c292b3c082c213b2b272e273a2f2d662127" class="plan-btn btn-outline">Nous contacter</a>
       </div>
     </div>
 
@@ -486,7 +486,11 @@ footer { background:var(--ink); border-top:1px solid #1a1a18; padding:1.8rem 3re
   <div class="footer-copy">© 2026 DiscoForge</div>
 </footer>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
 function toggleFaq(el) { el.parentElement.classList.toggle('open'); }
 const obs = new IntersectionObserver(entries => {
-  entries.forEach(e => { if (e.isInter
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
+}, { threshold: 0.08 });
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+</script>
+</body></html>
